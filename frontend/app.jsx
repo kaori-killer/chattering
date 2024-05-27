@@ -155,4 +155,18 @@ const ChatApp = () => {
   );
 };
 
-ReactDOM.render(<ChatApp />, document.getElementById('app'));
+function app() {
+	const container = document.getElementById("app");
+
+	if(!container) {
+		return;
+	}
+
+	const root = ReactDOM.createRoot(container);
+
+	root.render(
+		<ChatApp />
+	)
+}
+
+app();

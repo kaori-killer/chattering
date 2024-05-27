@@ -269,7 +269,19 @@ var ChatApp = function ChatApp() {
   );
 };
 
-_reactDom2['default'].render(_react2['default'].createElement(ChatApp, null), document.getElementById('app'));
+function app() {
+  var container = document.getElementById("app");
+
+  if (!container) {
+    return;
+  }
+
+  var root = _reactDom2['default'].createRoot(container);
+
+  root.render(_react2['default'].createElement(ChatApp, null));
+}
+
+app();
 
 },{"react":40,"react-dom":37,"socket.io-client":44}],2:[function(require,module,exports){
 module.exports = after

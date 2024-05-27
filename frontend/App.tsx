@@ -1,92 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import { useState, useEffect } from 'react';
+
 import io from 'socket.io-client';
+
+import UsersList from './components/UsersList';
+import ChangeNameForm from './components/ChangeNameForm';
+import MessageList from './components/MessageList';
+import MessageForm from './components/MessageForm';
 
 const socket = io.connect();
 
-const UsersList = ({ users }) => (
-  <div className='users'>
-    <h3> 참여자들 </h3>
-    <ul>
-      {users.map((user, i) => (
-        <li key={i}>
-          {user}
-        </li>
-      ))}
-    </ul>
-  </div>
-);
-
-const Message = ({ user, text }) => (
-  <div className="message">
-    <strong>{user} :</strong>
-    <span>{text}</span>
-  </div>
-);
-
-const MessageList = ({ messages }) => (
-  <div className='messages'>
-    <h2> 채팅방 </h2>
-    {messages.map((message, i) => (
-      <Message key={i} user={message.user} text={message.text} />
-    ))}
-  </div>
-);
-
-const MessageForm = ({ onMessageSubmit, user }) => {
-  const [text, setText] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    const message = { user, text };
-    onMessageSubmit(message);
-    setText('');
-  };
-
-  return (
-    <div className='message_form'>
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder='메시지 입력'
-          className='textinput'
-          onChange={(e) => setText(e.target.value)}
-          value={text}
-        />
-        <h3></h3>
-      </form>
-    </div>
-  );
-};
-
-const ChangeNameForm = ({ onChangeName }) => {
-  const [newName, setNewName] = useState('');
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onChangeName(newName);
-    setNewName('');
-  };
-
-  return (
-    <div className='change_name_form'>
-      <h3> 아이디 변경 </h3>
-      <form onSubmit={handleSubmit}>
-        <input
-          placeholder='변경할 아이디 입력'
-          onChange={(e) => setNewName(e.target.value)}
-          value={newName}
-        />
-      </form>
-    </div>
-  );
-};
-
-const ChatApp = () => {
+const ChatApp = ({ room }) => {
   const [users, setUsers] = useState([]);
   const [messages, setMessages] = useState([]);
   const [user, setUser] = useState('');
 
   useEffect(() => {
+    socket.emit('join:room', room);
+    
     socket.on('init', initialize);
     socket.on('send:message', messageReceive);
     socket.on('user:join', userJoined);
@@ -100,7 +30,7 @@ const ChatApp = () => {
       socket.off('user:left', userLeft);
       socket.off('change:name', userChangedName);
     };
-  }, []);
+  }, [room]);
 
   const initialize = (data) => {
     const { users, name } = data;
@@ -145,6 +75,7 @@ const ChatApp = () => {
     });
   };
 
+
   return (
     <div className='center'>
       <UsersList users={users} />
@@ -155,18 +86,48 @@ const ChatApp = () => {
   );
 };
 
-function app() {
-	const container = document.getElementById("app");
+export default function App() {
+  const [room, setRoom] = useState('');
+  const [isRoomSelected, setIsRoomSelected] = useState(false);
+  const [rooms, setRooms] = useState([]);
 
-	if(!container) {
-		return;
-	}
+ let filteredRooms = rooms.filter((room) => rooms.includes(room));
 
-	const root = ReactDOM.createRoot(container);
 
-	root.render(
-		<ChatApp />
-	)
+  const handleCreateRoom = () => {
+    if (room) {
+		setRooms((prevRooms) => [...prevRooms, room]);
+		setIsRoomSelected(true);
+    } else {
+      alert('방 이름을 입력하세요.');
+    }
+  };
+
+  return (
+    <div>
+        <div>
+          <input
+            placeholder='찾을 방'
+            value={room}
+            onChange={(e) => setRoom(e.target.value)}
+			/>
+          <button onClick={handleCreateRoom}>방 생성</button>
+          <h3>방 목록</h3>
+          <ul>
+            {filteredRooms.map((room, i) => (
+				<li key={i} onClick={() => { setRoom(room); setIsRoomSelected(true); }}>
+                {room}
+              </li>
+            ))}
+          </ul>
+        </div>
+		<div>
+		{isRoomSelected ? 
+    	    <ChatApp room={room} />
+			: 
+			<div></div>
+		}
+		</div>
+    </div>
+  );
 }
-
-app();

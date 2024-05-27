@@ -156,7 +156,9 @@ var ChangeNameForm = function ChangeNameForm(_ref5) {
   );
 };
 
-var ChatApp = function ChatApp() {
+var ChatApp = function ChatApp(_ref6) {
+  var room = _ref6.room;
+
   var _useState4 = (0, _react.useState)([]);
 
   var _useState42 = _slicedToArray(_useState4, 2);
@@ -179,6 +181,8 @@ var ChatApp = function ChatApp() {
   var setUser = _useState62[1];
 
   (0, _react.useEffect)(function () {
+    socket.emit('join:room', room);
+
     socket.on('init', initialize);
     socket.on('send:message', messageReceive);
     socket.on('user:join', userJoined);
@@ -192,7 +196,7 @@ var ChatApp = function ChatApp() {
       socket.off('user:left', userLeft);
       socket.off('change:name', userChangedName);
     };
-  }, []);
+  }, [room]);
 
   var initialize = function initialize(data) {
     var users = data.users;
@@ -269,8 +273,99 @@ var ChatApp = function ChatApp() {
   );
 };
 
-function app() {
-  var container = document.getElementById("app");
+function App() {
+  var _useState7 = (0, _react.useState)('');
+
+  var _useState72 = _slicedToArray(_useState7, 2);
+
+  var room = _useState72[0];
+  var setRoom = _useState72[1];
+
+  var _useState8 = (0, _react.useState)(false);
+
+  var _useState82 = _slicedToArray(_useState8, 2);
+
+  var isRoomSelected = _useState82[0];
+  var setIsRoomSelected = _useState82[1];
+
+  var _useState9 = (0, _react.useState)([]);
+
+  var _useState92 = _slicedToArray(_useState9, 2);
+
+  var rooms = _useState92[0];
+  var setRooms = _useState92[1];
+
+  var filteredRooms = [];
+
+  var handleSearchRoom = function handleSearchRoom() {
+    filteredRooms = rooms.filter(function (room) {
+      return rooms.includes(room);
+    });
+  };
+
+  var handleCreateRoom = function handleCreateRoom() {
+    if (room) {
+      setRooms(function (prevRooms) {
+        return [].concat(_toConsumableArray(prevRooms), [room]);
+      });
+      setIsRoomSelected(true);
+    } else {
+      alert('방 이름을 입력하세요.');
+    }
+  };
+
+  return _react2['default'].createElement(
+    'div',
+    null,
+    _react2['default'].createElement(
+      'div',
+      null,
+      _react2['default'].createElement('input', {
+        placeholder: '찾을 방',
+        value: room,
+        onChange: function (e) {
+          return setRoom(e.target.value);
+        }
+      }),
+      _react2['default'].createElement(
+        'button',
+        { onClick: handleSearchRoom },
+        '검색'
+      ),
+      _react2['default'].createElement(
+        'button',
+        { onClick: handleCreateRoom },
+        '방 생성'
+      ),
+      _react2['default'].createElement(
+        'h3',
+        null,
+        '방 목록'
+      ),
+      _react2['default'].createElement(
+        'ul',
+        null,
+        filteredRooms.map(function (room, i) {
+          return _react2['default'].createElement(
+            'li',
+            { key: i, onClick: function () {
+                setRoom(room);setIsRoomSelected(true);
+              } },
+            room
+          );
+        })
+      )
+    ),
+    _react2['default'].createElement(
+      'div',
+      null,
+      isRoomSelected ? _react2['default'].createElement(ChatApp, { room: room }) : _react2['default'].createElement('div', null)
+    )
+  );
+}
+
+function main() {
+  var container = document.getElementById("root");
 
   if (!container) {
     return;
@@ -278,10 +373,10 @@ function app() {
 
   var root = _reactDom2['default'].createRoot(container);
 
-  root.render(_react2['default'].createElement(ChatApp, null));
+  root.render(_react2['default'].createElement(App, null));
 }
 
-app();
+main();
 
 },{"react":40,"react-dom":37,"socket.io-client":44}],2:[function(require,module,exports){
 module.exports = after

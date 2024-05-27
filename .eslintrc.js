@@ -6,7 +6,6 @@ module.exports = {
     },
     extends: [
       'airbnb',
-      'plugin:@typescript-eslint/recommended',
       'plugin:react/recommended',
       'plugin:react/jsx-runtime',
     ],
@@ -17,7 +16,6 @@ module.exports = {
     },
     plugins: [
       'react',
-      '@typescript-eslint',
     ],
     settings: {
       'import/resolver': {

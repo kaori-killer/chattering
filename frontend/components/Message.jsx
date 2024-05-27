@@ -1,3 +1,5 @@
+import React from 'react';
+
 const Message = ({ user, text }) => (
     <div className="message">
       <strong>{user} :</strong>

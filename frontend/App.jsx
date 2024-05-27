@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import io from 'socket.io-client';
   
-import UsersList from './components/UsersList';
-import ChangeNameForm from './components/ChangeNameForm';
-import MessageList from './components/MessageList';
-import MessageForm from './components/MessageForm';
+import UsersList from './components/UsersList.jsx';
+import ChangeNameForm from './components/ChangeNameForm.jsx';
+import MessageList from './components/MessageList.jsx';
+import MessageForm from './components/MessageForm.jsx';
 
 const socket = io.connect();
 
@@ -104,30 +104,6 @@ export default function App() {
   };
 
   return (
-    <div>
-        <div>
-          <input
-            placeholder='찾을 방'
-            value={room}
-            onChange={(e) => setRoom(e.target.value)}
-			/>
-          <button onClick={handleCreateRoom}>방 생성</button>
-          <h3>방 목록</h3>
-          <ul>
-            {filteredRooms.map((room, i) => (
-				<li key={i} onClick={() => { setRoom(room); setIsRoomSelected(true); }}>
-                {room}
-              </li>
-            ))}
-          </ul>
-        </div>
-		<div>
-		{isRoomSelected ? 
-    	    <ChatApp room={room} />
-			: 
-			<div></div>
-		}
-		</div>
-    </div>
+      <ChatApp room={room} />
   );
 }

@@ -1,3 +1,5 @@
+import React, { useState } from 'react';
+
 const MessageForm = ({ onMessageSubmit, user }) => {
     const [text, setText] = useState('');
   

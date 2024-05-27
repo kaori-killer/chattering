@@ -3,8 +3,8 @@
   "version": "0.6.9",
   "private": true,
   "scripts": {
-    "build": "browserify ./frontend/main.jsx -t babelify --outfile ./public/js/app.js",
-    "start": "browserify ./frontend/main.jsx -t babelify --outfile ./public/js/app.js && node app.js"
+    "build": "browserify ./frontend/main.tsx -t babelify --outfile ./public/js/app.js",
+    "start": "browserify ./frontend/main.tsx -t babelify --outfile ./public/js/app.js && node app.js"
   },
   "dependencies": {
     "express": "^4.13.1",
@@ -25,5 +25,25 @@
     "globals": "^15.3.0",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.10.0"
+  },
+  "browserify": {
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            "@babel/preset-env"
+          ]
+        }
+      ]
+    ]
+  },
+  "eslintConfig": {
+    "parserOptions": {
+      "parser": "babel-eslint",
+      "sourceType": "module",
+      "allowImportExportEverywhere": true,
+      "ecmaVersion": 2015
+    }
   }
 }

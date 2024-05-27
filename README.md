@@ -1,3 +1,8 @@
+# 기능 명세서
+
+
+
+
 <p align="left"><img src = "./images/INU.png"  width=40%></p>
 
 #### Dweb ❌ Incheon National University (INU)

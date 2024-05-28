@@ -15,7 +15,7 @@ const ChatApp = ({ room }) => {
   const [user, setUser] = useState('');
 
   const filteredMessages = messages.filter((message)=> message.room === room);
-
+  
   useEffect(() => {
     socket.emit('join:room', room);
     
@@ -24,7 +24,7 @@ const ChatApp = ({ room }) => {
     socket.on('user:join', userJoined);
     socket.on('user:left', userLeft);
     socket.on('change:name', userChangedName);
-
+    
     return () => {
       localStorage.setItem('messages',  JSON.stringify(messages));
       socket.off('init', initialize);
@@ -90,10 +90,12 @@ const ChatApp = ({ room }) => {
 };
 
 export default function App() {
-  const [rooms, setRooms] = useState([]);
+  const [rooms, setRooms] = useState(JSON.parse(localStorage.getItem('rooms')) || []);
   const [filteredRooms, setFilteredRooms] = useState([]);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [textField, setTextField] = useState('');
+
+  localStorage.setItem('rooms',  JSON.stringify(rooms));
 
   const handleSearchRooms = () => {
     const filtered = rooms.filter((room) => room.includes(textField));

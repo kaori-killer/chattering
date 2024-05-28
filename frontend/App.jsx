@@ -11,7 +11,7 @@ const socket = io.connect();
 
 const ChatApp = ({ room }) => {
   const [users, setUsers] = useState([]);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState(JSON.parse(localStorage.getItem('messages')) || []);
   const [user, setUser] = useState('');
 
   const filteredMessages = messages.filter((message)=> message.room === room);
@@ -26,6 +26,7 @@ const ChatApp = ({ room }) => {
     socket.on('change:name', userChangedName);
 
     return () => {
+      localStorage.setItem('messages',  JSON.stringify(messages));
       socket.off('init', initialize);
       socket.off('send:message', messageReceive);
       socket.off('user:join', userJoined);

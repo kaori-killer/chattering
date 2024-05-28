@@ -11,7 +11,7 @@ const ChangeNameForm = ({ onChangeName }) => {
   
     return (
       <div className='change_name_form'>
-        <h3> 아이디 변경 </h3>
+        <h3> 회원가입 </h3>
         <form onSubmit={handleSubmit}>
           <input
             placeholder='변경할 아이디 입력'

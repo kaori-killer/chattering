@@ -49,7 +49,7 @@ var ChatApp = function ChatApp(_ref) {
   var users = _useState2[0];
   var setUsers = _useState2[1];
 
-  var _useState3 = (0, _react.useState)([]);
+  var _useState3 = (0, _react.useState)(JSON.parse(localStorage.getItem('messages')) || []);
 
   var _useState32 = _slicedToArray(_useState3, 2);
 
@@ -77,6 +77,7 @@ var ChatApp = function ChatApp(_ref) {
     socket.on('change:name', userChangedName);
 
     return function () {
+      localStorage.setItem('messages', JSON.stringify(messages));
       socket.off('init', initialize);
       socket.off('send:message', messageReceive);
       socket.off('user:join', userJoined);
@@ -143,7 +144,6 @@ var ChatApp = function ChatApp(_ref) {
       }
 
       setUsers([].concat(_toConsumableArray(users), [newName]));
-      // setUsers((prevUsers) => prevUsers.map((user) => (user === oldName ? newName : user)));
       setUser(newName);
     });
   };
@@ -303,7 +303,7 @@ var ChangeNameForm = function ChangeNameForm(_ref) {
     _react2['default'].createElement(
       'h3',
       null,
-      ' 아이디 변경 '
+      ' 회원가입 '
     ),
     _react2['default'].createElement(
       'form',

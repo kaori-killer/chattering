@@ -151,49 +151,115 @@ var ChatApp = function ChatApp(_ref) {
     { className: 'center' },
     _react2['default'].createElement(_componentsUsersListJsx2['default'], { users: users }),
     _react2['default'].createElement(_componentsChangeNameFormJsx2['default'], { onChangeName: handleChangeName }),
-    _react2['default'].createElement(_componentsMessageListJsx2['default'], { messages: messages }),
+    _react2['default'].createElement(_componentsMessageListJsx2['default'], { messages: messages, room: room }),
     _react2['default'].createElement(_componentsMessageFormJsx2['default'], { onMessageSubmit: handleMessageSubmit, user: user })
   );
 };
 
 function App() {
-  var _useState5 = (0, _react.useState)('');
+  var _useState5 = (0, _react.useState)([]);
 
   var _useState52 = _slicedToArray(_useState5, 2);
 
-  var room = _useState52[0];
-  var setRoom = _useState52[1];
+  var rooms = _useState52[0];
+  var setRooms = _useState52[1];
 
-  var _useState6 = (0, _react.useState)(false);
+  var _useState6 = (0, _react.useState)([]);
 
   var _useState62 = _slicedToArray(_useState6, 2);
 
-  var isRoomSelected = _useState62[0];
-  var setIsRoomSelected = _useState62[1];
+  var filteredRooms = _useState62[0];
+  var setFilteredRooms = _useState62[1];
 
-  var _useState7 = (0, _react.useState)([]);
+  var _useState7 = (0, _react.useState)(null);
 
   var _useState72 = _slicedToArray(_useState7, 2);
 
-  var rooms = _useState72[0];
-  var setRooms = _useState72[1];
+  var selectedRoom = _useState72[0];
+  var setSelectedRoom = _useState72[1];
 
-  var filteredRooms = rooms.filter(function (room) {
-    return rooms.includes(room);
-  });
+  var _useState8 = (0, _react.useState)('');
 
-  var handleCreateRoom = function handleCreateRoom() {
-    if (room) {
-      setRooms(function (prevRooms) {
-        return [].concat(_toConsumableArray(prevRooms), [room]);
-      });
-      setIsRoomSelected(true);
+  var _useState82 = _slicedToArray(_useState8, 2);
+
+  var textField = _useState82[0];
+  var setTextField = _useState82[1];
+
+  var handleSearchRooms = function handleSearchRooms() {
+    var filtered = rooms.filter(function (room) {
+      return room.includes(textField);
+    });
+
+    if (filtered.length > 0) {
+      setFilteredRooms(filtered);
     } else {
-      alert('방 이름을 입력하세요.');
+      var createNewRoom = confirm("방을 새로 만드시겠습니까?");
+      if (createNewRoom) {
+        var newRooms = [].concat(_toConsumableArray(rooms), [textField]);
+        setRooms(newRooms);
+        setFilteredRooms([]);
+        setSelectedRoom(textField);
+      }
     }
   };
 
-  return _react2['default'].createElement(ChatApp, { room: room });
+  return _react2['default'].createElement(
+    'div',
+    null,
+    _react2['default'].createElement(
+      'div',
+      null,
+      _react2['default'].createElement(
+        'h1',
+        null,
+        '채팅방 목록'
+      ),
+      _react2['default'].createElement('input', {
+        type: 'text',
+        placeholder: '찾을 방',
+        value: textField,
+        onChange: function (e) {
+          return setTextField(e.target.value);
+        }
+      }),
+      _react2['default'].createElement(
+        'button',
+        { type: 'button', onClick: handleSearchRooms },
+        '검색'
+      ),
+      _react2['default'].createElement(
+        'ul',
+        null,
+        filteredRooms.map(function (room, index) {
+          return _react2['default'].createElement(
+            'li',
+            { key: index },
+            _react2['default'].createElement(
+              'span',
+              null,
+              room
+            ),
+            _react2['default'].createElement(
+              'button',
+              { onClick: function () {
+                  return setSelectedRoom(room);
+                } },
+              '입장하기'
+            )
+          );
+        })
+      )
+    ),
+    _react2['default'].createElement(
+      'div',
+      null,
+      selectedRoom ? _react2['default'].createElement(ChatApp, { room: selectedRoom }) : _react2['default'].createElement(
+        'div',
+        null,
+        '채팅방을 선택해주세요'
+      )
+    )
+  );
 }
 
 module.exports = exports['default'];
@@ -364,13 +430,16 @@ var _MessageJsx2 = _interopRequireDefault(_MessageJsx);
 
 var MessageList = function MessageList(_ref) {
   var messages = _ref.messages;
+  var room = _ref.room;
   return _react2['default'].createElement(
     'div',
     { className: 'messages' },
     _react2['default'].createElement(
       'h2',
       null,
-      ' 채팅방 '
+      ' 채팅방 - ',
+      room,
+      ' '
     ),
     messages.map(function (message, i) {
       return _react2['default'].createElement(_MessageJsx2['default'], { key: i, user: message.user, text: message.text });

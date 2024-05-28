@@ -80,30 +80,65 @@ const ChatApp = ({ room }) => {
     <div className='center'>
       <UsersList users={users} />
       <ChangeNameForm onChangeName={handleChangeName} />
-      <MessageList messages={messages} />
+      <MessageList messages={messages} room={room} />
       <MessageForm onMessageSubmit={handleMessageSubmit} user={user} />
     </div>
   );
 };
 
 export default function App() {
-  const [room, setRoom] = useState('');
-  const [isRoomSelected, setIsRoomSelected] = useState(false);
   const [rooms, setRooms] = useState([]);
+  const [filteredRooms, setFilteredRooms] = useState([]);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [textField, setTextField] = useState('');
 
- let filteredRooms = rooms.filter((room) => rooms.includes(room));
+  const handleSearchRooms = () => {
+    const filtered = rooms.filter((room) => room.includes(textField));
 
-
-  const handleCreateRoom = () => {
-    if (room) {
-		setRooms((prevRooms) => [...prevRooms, room]);
-		setIsRoomSelected(true);
+    if (filtered.length > 0) {
+      setFilteredRooms(filtered);
     } else {
-      alert('방 이름을 입력하세요.');
+      const createNewRoom = confirm("방을 새로 만드시겠습니까?");
+      if (createNewRoom) {
+        const newRooms = [...rooms, textField];
+        setRooms(newRooms);
+        setFilteredRooms([]);
+        setSelectedRoom(textField);
+      }
     }
   };
 
   return (
-      <ChatApp room={room} />
+    <div>
+      <div>
+        <h1>채팅방 목록</h1>
+
+        <input
+          type="text"
+          placeholder="찾을 방"
+          value={textField}
+          onChange={(e) => setTextField(e.target.value)}
+        />
+        <button type="button" onClick={handleSearchRooms}>
+          검색
+        </button>
+
+        <ul>
+          {filteredRooms.map((room, index) => (
+            <li key={index}>
+              <span>{room}</span>
+              <button onClick={() => setSelectedRoom(room)}>입장하기</button>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        {selectedRoom ? (
+          <ChatApp room={selectedRoom} />
+        ) : (
+          <div>채팅방을 선택해주세요</div>
+        )}
+      </div>
+    </div>
   );
 }

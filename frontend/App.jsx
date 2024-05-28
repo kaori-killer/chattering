@@ -14,6 +14,8 @@ const ChatApp = ({ room }) => {
   const [messages, setMessages] = useState([]);
   const [user, setUser] = useState('');
 
+  const filteredMessages = messages.filter((message)=> message.room === room);
+
   useEffect(() => {
     socket.emit('join:room', room);
     
@@ -72,7 +74,6 @@ const ChatApp = ({ room }) => {
       }
 
       setUsers([...users, newName]);
-      // setUsers((prevUsers) => prevUsers.map((user) => (user === oldName ? newName : user)));
       setUser(newName);
     });
   };
@@ -81,8 +82,8 @@ const ChatApp = ({ room }) => {
     <div className='center'>
       <UsersList users={users} />
       <ChangeNameForm onChangeName={handleChangeName} />
-      <MessageList messages={messages} room={room} />
-      <MessageForm onMessageSubmit={handleMessageSubmit} user={user} />
+      <MessageList messages={filteredMessages} room={room} />
+      <MessageForm onMessageSubmit={handleMessageSubmit} user={user} room={room} />
     </div>
   );
 };

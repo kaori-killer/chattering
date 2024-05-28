@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 
-const MessageForm = ({ onMessageSubmit, user }) => {
+const MessageForm = ({ onMessageSubmit, user, room }) => {
     const [text, setText] = useState('');
   
     const handleSubmit = (e) => {
       e.preventDefault();
-      const message = { user, text };
+      const message = { user, text, room };
       onMessageSubmit(message);
       setText('');
     };

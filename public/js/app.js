@@ -63,6 +63,10 @@ var ChatApp = function ChatApp(_ref) {
   var user = _useState42[0];
   var setUser = _useState42[1];
 
+  var filteredMessages = messages.filter(function (message) {
+    return message.room === room;
+  });
+
   (0, _react.useEffect)(function () {
     socket.emit('join:room', room);
 
@@ -137,7 +141,7 @@ var ChatApp = function ChatApp(_ref) {
       if (!result) {
         return alert('There was an error changing your name');
       }
-      console.log(users, newName);
+
       setUsers([].concat(_toConsumableArray(users), [newName]));
       // setUsers((prevUsers) => prevUsers.map((user) => (user === oldName ? newName : user)));
       setUser(newName);
@@ -149,8 +153,8 @@ var ChatApp = function ChatApp(_ref) {
     { className: 'center' },
     _react2['default'].createElement(_componentsUsersListJsx2['default'], { users: users }),
     _react2['default'].createElement(_componentsChangeNameFormJsx2['default'], { onChangeName: handleChangeName }),
-    _react2['default'].createElement(_componentsMessageListJsx2['default'], { messages: messages, room: room }),
-    _react2['default'].createElement(_componentsMessageFormJsx2['default'], { onMessageSubmit: handleMessageSubmit, user: user })
+    _react2['default'].createElement(_componentsMessageListJsx2['default'], { messages: filteredMessages, room: room }),
+    _react2['default'].createElement(_componentsMessageFormJsx2['default'], { onMessageSubmit: handleMessageSubmit, user: user, room: room })
   );
 };
 
@@ -372,6 +376,7 @@ var _react2 = _interopRequireDefault(_react);
 var MessageForm = function MessageForm(_ref) {
   var onMessageSubmit = _ref.onMessageSubmit;
   var user = _ref.user;
+  var room = _ref.room;
 
   var _useState = (0, _react.useState)('');
 
@@ -382,7 +387,7 @@ var MessageForm = function MessageForm(_ref) {
 
   var handleSubmit = function handleSubmit(e) {
     e.preventDefault();
-    var message = { user: user, text: text };
+    var message = { user: user, text: text, room: room };
     onMessageSubmit(message);
     setText('');
   };

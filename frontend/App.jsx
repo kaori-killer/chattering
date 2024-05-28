@@ -70,11 +70,12 @@ const ChatApp = ({ room }) => {
       if (!result) {
         return alert('There was an error changing your name');
       }
-      setUsers((prevUsers) => prevUsers.map((user) => (user === oldName ? newName : user)));
+
+      setUsers([...users, newName]);
+      // setUsers((prevUsers) => prevUsers.map((user) => (user === oldName ? newName : user)));
       setUser(newName);
     });
   };
-
 
   return (
     <div className='center'>

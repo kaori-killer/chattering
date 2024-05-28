@@ -137,11 +137,9 @@ var ChatApp = function ChatApp(_ref) {
       if (!result) {
         return alert('There was an error changing your name');
       }
-      setUsers(function (prevUsers) {
-        return prevUsers.map(function (user) {
-          return user === oldName ? newName : user;
-        });
-      });
+      console.log(users, newName);
+      setUsers([].concat(_toConsumableArray(users), [newName]));
+      // setUsers((prevUsers) => prevUsers.map((user) => (user === oldName ? newName : user)));
       setUser(newName);
     });
   };

@@ -153,7 +153,7 @@ var ChatApp = function ChatApp(_ref) {
     { className: 'center' },
     _react2['default'].createElement(_componentsUsersListJsx2['default'], { users: users }),
     _react2['default'].createElement(_componentsChangeNameFormJsx2['default'], { onChangeName: handleChangeName }),
-    _react2['default'].createElement(_componentsMessageListJsx2['default'], { messages: filteredMessages, room: room }),
+    _react2['default'].createElement(_componentsMessageListJsx2['default'], { messages: filteredMessages, room: room, user: user }),
     _react2['default'].createElement(_componentsMessageFormJsx2['default'], { onMessageSubmit: handleMessageSubmit, user: user, room: room })
   );
 };
@@ -325,40 +325,42 @@ exports['default'] = ChangeNameForm;
 module.exports = exports['default'];
 
 },{"react":47}],3:[function(require,module,exports){
-"use strict";
+'use strict';
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
 });
+exports['default'] = Message;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var Message = function Message(_ref) {
+function Message(_ref) {
   var user = _ref.user;
   var text = _ref.text;
-  return _react2["default"].createElement(
-    "div",
-    { className: "message" },
-    _react2["default"].createElement(
-      "strong",
+  var isOwnMessage = _ref.isOwnMessage;
+
+  return _react2['default'].createElement(
+    'div',
+    { className: 'message, ' + (isOwnMessage ? 'message_item_end' : 'message_item_start') },
+    _react2['default'].createElement(
+      'strong',
       null,
       user,
-      " :"
+      ' :'
     ),
-    _react2["default"].createElement(
-      "span",
+    _react2['default'].createElement(
+      'span',
       null,
       text
     )
   );
-};
+}
 
-exports["default"] = Message;
-module.exports = exports["default"];
+module.exports = exports['default'];
 
 },{"react":47}],4:[function(require,module,exports){
 'use strict';
@@ -436,6 +438,7 @@ var _MessageJsx2 = _interopRequireDefault(_MessageJsx);
 var MessageList = function MessageList(_ref) {
   var messages = _ref.messages;
   var room = _ref.room;
+  var user = _ref.user;
   return _react2['default'].createElement(
     'div',
     { className: 'messages' },
@@ -446,9 +449,13 @@ var MessageList = function MessageList(_ref) {
       room,
       ' '
     ),
-    messages.map(function (message, i) {
-      return _react2['default'].createElement(_MessageJsx2['default'], { key: i, user: message.user, text: message.text });
-    })
+    _react2['default'].createElement(
+      'div',
+      { className: 'message_list' },
+      messages.map(function (message, i) {
+        return _react2['default'].createElement(_MessageJsx2['default'], { key: i, user: message.user, text: message.text, isOwnMessage: user === message.user });
+      })
+    )
   );
 };
 

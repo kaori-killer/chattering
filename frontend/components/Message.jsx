@@ -1,10 +1,13 @@
 import React from 'react';
 
-const Message = ({ user, text }) => (
-    <div className="message">
+export default function Message({ user, text, isOwnMessage }) {
+
+
+
+  return( 
+    <div className={`message, ${ isOwnMessage ? 'message_item_end' : 'message_item_start'}`}>
       <strong>{user} :</strong>
       <span>{text}</span>
     </div>
   );
-
-export default Message;
+}

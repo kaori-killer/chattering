@@ -15,6 +15,20 @@ body{
 	border : 1px solid black;
 	padding: 1em;
 }
+
+.message_list {
+	display: flex;
+	flex-direction: column;
+}
+
+.message_item_start {
+	align-self: start;
+}
+
+.message_item_end {
+	align-self: end;
+}
+
 .message_form,
 .change_name_form{
 	padding: 1em;

@@ -83,7 +83,7 @@ const ChatApp = ({ room }) => {
     <div className='center'>
       <UsersList users={users} />
       <ChangeNameForm onChangeName={handleChangeName} />
-      <MessageList messages={filteredMessages} room={room} />
+      <MessageList messages={filteredMessages} room={room} user={user} />
       <MessageForm onMessageSubmit={handleMessageSubmit} user={user} room={room} />
     </div>
   );

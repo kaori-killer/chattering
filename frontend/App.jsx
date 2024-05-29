@@ -91,7 +91,7 @@ const ChatApp = ({ room }) => {
 
 export default function App() {
   const [rooms, setRooms] = useState(JSON.parse(localStorage.getItem('rooms')) || []);
-  const [filteredRooms, setFilteredRooms] = useState([]);
+  const [filteredRooms, setFilteredRooms] = useState(JSON.parse(localStorage.getItem('rooms')) || []);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [textField, setTextField] = useState('');
 

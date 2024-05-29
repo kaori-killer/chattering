@@ -66,7 +66,6 @@ var ChatApp = function ChatApp(_ref) {
   var filteredMessages = messages.filter(function (message) {
     return message.room === room;
   });
-  localStorage.setItem('messages', JSON.stringify(messages));
 
   (0, _react.useEffect)(function () {
     socket.emit('join:room', room);
@@ -78,6 +77,7 @@ var ChatApp = function ChatApp(_ref) {
     socket.on('change:name', userChangedName);
 
     return function () {
+      localStorage.setItem('messages', JSON.stringify(messages));
       socket.off('init', initialize);
       socket.off('send:message', messageReceive);
       socket.off('user:join', userJoined);
@@ -166,7 +166,7 @@ function App() {
   var rooms = _useState52[0];
   var setRooms = _useState52[1];
 
-  var _useState6 = (0, _react.useState)([]);
+  var _useState6 = (0, _react.useState)(JSON.parse(localStorage.getItem('rooms')) || []);
 
   var _useState62 = _slicedToArray(_useState6, 2);
 

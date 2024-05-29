@@ -8,7 +8,7 @@ import MessageForm from './MessageForm.jsx';
 
 const socket = io.connect();
 
-const ChatApp = ({ room, users, user }) => {
+const ChatApp = ({ room, usersByRoom, user }) => {
     const [messages, setMessages] = useState(JSON.parse(localStorage.getItem('messages')) || []);
   
     const filteredMessages = messages.filter((message)=> message.room === room);
@@ -34,7 +34,7 @@ const ChatApp = ({ room, users, user }) => {
   
     return (
       <div className='center'>
-        <UsersList users={users} />
+        <UsersList users={usersByRoom[room]} />
         <MessageList messages={filteredMessages} room={room} user={user} />
         <MessageForm onMessageSubmit={handleMessageSubmit} user={user} room={room} />
       </div>

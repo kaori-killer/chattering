@@ -16,44 +16,30 @@ export default function App() {
   const [user, setUser] = useState('');
 
   const [rooms, setRooms] = useState(JSON.parse(localStorage.getItem('rooms')) || []);
+  const [usersByRoom, setUsersByRoom] = useState({});
+
   const [filteredRooms, setFilteredRooms] = useState(rooms);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [textField, setTextField] = useState('');
 
-  console.log(users);
+  console.log(users, usersByRoom);
 
   useEffect(() => {
     localStorage.setItem('rooms', JSON.stringify(rooms));
   }, [rooms]);
 
-  // 안 씀
-  const userJoined = (data) => {
-    const { name } = data;
-    users[room].append(name);
-    setUsers((prevUsers) => [...prevUsers, name]);
-  };
-
-  // 안 씀
-  const userLeft = (data) => {
-    const { name } = data;
-    setUsers((prevUsers) => prevUsers.filter((user) => user !== name));
-  };
-
   const userChangedName = (data) => {
     const { oldName, newName } = data;
+
     setUsers((prevUsers) =>
       prevUsers.map((user) => (user === oldName ? newName : user))
     );
   };
 
   useEffect(() => {
-    socket.on('user:join', userJoined);
-    socket.on('user:left', userLeft);
     socket.on('change:name', userChangedName);
 
     return () => {
-      socket.off('user:join', userJoined);
-      socket.off('user:left', userLeft);
       socket.off('change:name', userChangedName);
     };
   }, [socket]);
@@ -70,6 +56,10 @@ export default function App() {
         setRooms(newRooms);
         setFilteredRooms([]);
         setSelectedRoom(textField);
+
+        if(!Object.keys(usersByRoom).includes(textField)){
+          setUsersByRoom({...usersByRoom, [textField]: [user]});
+        }
       }
     }
   };
@@ -77,7 +67,7 @@ export default function App() {
   const handleChangeName = (newName) => {
     socket.emit('change:name', { name: newName }, (result) => {
       if (!result) {
-        return alert('동일한 아이디가 이미 존재합니다. 다른 아이디로 만들어주세요.');
+        return alert('동일한 아이디가  이미 존재합니다. 다른 아이디로 만들어주세요.');
       }
 
       setUsers((prevUsers) => [...prevUsers, newName]);
@@ -97,11 +87,12 @@ export default function App() {
         filteredRooms={filteredRooms} 
         handleSearchRooms={handleSearchRooms}
         setSelectedRoom={setSelectedRoom}
+        setUsersByRoom={setUsersByRoom}
         user={user}
       />
       {selectedRoom ? 
         (
-          <ChatApp socket={socket} room={selectedRoom} users={users} user={user} />
+          <ChatApp socket={socket} room={selectedRoom} usersByRoom={usersByRoom} user={user} />
         ) : 
         (
           <div>현재 입장된 채팅방이 없습니다.</div>

@@ -7,11 +7,15 @@ Object.defineProperty(exports, '__esModule', {
 
 var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
 
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 exports['default'] = App;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var _react = require('react');
 
@@ -61,53 +65,39 @@ function App() {
   var rooms = _useState42[0];
   var setRooms = _useState42[1];
 
-  var _useState5 = (0, _react.useState)(rooms);
+  var _useState5 = (0, _react.useState)({});
 
   var _useState52 = _slicedToArray(_useState5, 2);
 
-  var filteredRooms = _useState52[0];
-  var setFilteredRooms = _useState52[1];
+  var usersByRoom = _useState52[0];
+  var setUsersByRoom = _useState52[1];
 
-  var _useState6 = (0, _react.useState)(null);
+  var _useState6 = (0, _react.useState)(rooms);
 
   var _useState62 = _slicedToArray(_useState6, 2);
 
-  var selectedRoom = _useState62[0];
-  var setSelectedRoom = _useState62[1];
+  var filteredRooms = _useState62[0];
+  var setFilteredRooms = _useState62[1];
 
-  var _useState7 = (0, _react.useState)('');
+  var _useState7 = (0, _react.useState)(null);
 
   var _useState72 = _slicedToArray(_useState7, 2);
 
-  var textField = _useState72[0];
-  var setTextField = _useState72[1];
+  var selectedRoom = _useState72[0];
+  var setSelectedRoom = _useState72[1];
 
-  console.log(users);
+  var _useState8 = (0, _react.useState)('');
+
+  var _useState82 = _slicedToArray(_useState8, 2);
+
+  var textField = _useState82[0];
+  var setTextField = _useState82[1];
+
+  console.log(users, usersByRoom);
 
   (0, _react.useEffect)(function () {
     localStorage.setItem('rooms', JSON.stringify(rooms));
   }, [rooms]);
-
-  var userJoined = function userJoined(data) {
-    var name = data.name;
-
-    users[room].append(name);
-    setUsers(function (prevUsers) {
-      return [].concat(_toConsumableArray(prevUsers), [{
-        name: room
-      }]);
-    });
-  };
-
-  var userLeft = function userLeft(data) {
-    var name = data.name;
-
-    setUsers(function (prevUsers) {
-      return prevUsers.filter(function (user) {
-        return user !== name;
-      });
-    });
-  };
 
   var userChangedName = function userChangedName(data) {
     var oldName = data.oldName;
@@ -121,13 +111,9 @@ function App() {
   };
 
   (0, _react.useEffect)(function () {
-    socket.on('user:join', userJoined);
-    socket.on('user:left', userLeft);
     socket.on('change:name', userChangedName);
 
     return function () {
-      socket.off('user:join', userJoined);
-      socket.off('user:left', userLeft);
       socket.off('change:name', userChangedName);
     };
   }, [socket]);
@@ -146,6 +132,10 @@ function App() {
         setRooms(newRooms);
         setFilteredRooms([]);
         setSelectedRoom(textField);
+
+        if (!Object.keys(usersByRoom).includes(textField)) {
+          setUsersByRoom(_extends({}, usersByRoom, _defineProperty({}, textField, [user])));
+        }
       }
     }
   };
@@ -153,7 +143,7 @@ function App() {
   var handleChangeName = function handleChangeName(newName) {
     socket.emit('change:name', { name: newName }, function (result) {
       if (!result) {
-        return alert('같은 아이디가 있습니다. 다른 아이디로 만들어주세요.');
+        return alert('동일한 아이디가  이미 존재합니다. 다른 아이디로 만들어주세요.');
       }
 
       setUsers(function (prevUsers) {
@@ -182,9 +172,11 @@ function App() {
       setTextField: setTextField,
       filteredRooms: filteredRooms,
       handleSearchRooms: handleSearchRooms,
-      setSelectedRoom: setSelectedRoom
+      setSelectedRoom: setSelectedRoom,
+      setUsersByRoom: setUsersByRoom,
+      user: user
     }),
-    selectedRoom ? _react2['default'].createElement(_componentsChatAppJsx2['default'], { socket: socket, room: selectedRoom, users: users, user: user }) : _react2['default'].createElement(
+    selectedRoom ? _react2['default'].createElement(_componentsChatAppJsx2['default'], { socket: socket, room: selectedRoom, usersByRoom: usersByRoom, user: user }) : _react2['default'].createElement(
       'div',
       null,
       '현재 입장된 채팅방이 없습니다.'
@@ -287,7 +279,7 @@ var socket = _socketIoClient2['default'].connect();
 
 var ChatApp = function ChatApp(_ref) {
   var room = _ref.room;
-  var users = _ref.users;
+  var usersByRoom = _ref.usersByRoom;
   var user = _ref.user;
 
   var _useState = (0, _react.useState)(JSON.parse(localStorage.getItem('messages')) || []);
@@ -327,7 +319,7 @@ var ChatApp = function ChatApp(_ref) {
   return _react2['default'].createElement(
     'div',
     { className: 'center' },
-    _react2['default'].createElement(_UsersListJsx2['default'], { users: users }),
+    _react2['default'].createElement(_UsersListJsx2['default'], { users: usersByRoom[room] }),
     _react2['default'].createElement(_MessageListJsx2['default'], { messages: filteredMessages, room: room, user: user }),
     _react2['default'].createElement(_MessageFormJsx2['default'], { onMessageSubmit: handleMessageSubmit, user: user, room: room })
   );
@@ -342,9 +334,16 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
 exports["default"] = ChattingList;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var _react = require('react');
 
@@ -356,6 +355,26 @@ function ChattingList(_ref) {
   var filteredRooms = _ref.filteredRooms;
   var handleSearchRooms = _ref.handleSearchRooms;
   var setSelectedRoom = _ref.setSelectedRoom;
+  var setUsersByRoom = _ref.setUsersByRoom;
+  var user = _ref.user;
+  var usersByRoom = _ref.usersByRoom;
+
+  var handleEnterRoom = function handleEnterRoom(room) {
+    setSelectedRoom(room);
+
+    setUsersByRoom(function (prevUsersByRoom) {
+      if (!prevUsersByRoom[room]) {
+        // If the room doesn't exist, create it with the current user
+        return _extends({}, prevUsersByRoom, _defineProperty({}, room, [user]));
+      } else if (!prevUsersByRoom[room].includes(user)) {
+        // If the room exists but the user is not in it, add the user to the room
+        return _extends({}, prevUsersByRoom, _defineProperty({}, room, [].concat(_toConsumableArray(prevUsersByRoom[room]), [user])));
+      } else {
+        // If the room exists and the user is already in it, return the state unchanged
+        return prevUsersByRoom;
+      }
+    });
+  };
 
   return _react2["default"].createElement(
     "div",
@@ -393,7 +412,7 @@ function ChattingList(_ref) {
           _react2["default"].createElement(
             "button",
             { onClick: function () {
-                return setSelectedRoom(room);
+                return handleEnterRoom(room);
               } },
             "입장하기"
           )
@@ -549,6 +568,7 @@ module.exports = exports['default'];
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
+exports['default'] = UsersList;
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -556,9 +576,10 @@ var _react = require('react');
 
 var _react2 = _interopRequireDefault(_react);
 
-var UsersList = function UsersList(_ref) {
+function UsersList(_ref) {
   var users = _ref.users;
-  return _react2['default'].createElement(
+
+  _react2['default'].createElement(
     'div',
     { className: 'users' },
     _react2['default'].createElement(
@@ -569,7 +590,7 @@ var UsersList = function UsersList(_ref) {
     _react2['default'].createElement(
       'ul',
       null,
-      users.map(function (user, i) {
+      users || [].map(function (user, i) {
         return _react2['default'].createElement(
           'li',
           { key: i },
@@ -578,9 +599,9 @@ var UsersList = function UsersList(_ref) {
       })
     )
   );
-};
+}
 
-exports['default'] = UsersList;
+;
 module.exports = exports['default'];
 
 },{"react":49}],9:[function(require,module,exports){

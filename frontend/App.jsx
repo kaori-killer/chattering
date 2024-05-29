@@ -20,15 +20,20 @@ export default function App() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [textField, setTextField] = useState('');
 
+  console.log(users);
+
   useEffect(() => {
     localStorage.setItem('rooms', JSON.stringify(rooms));
   }, [rooms]);
 
+  // 안 씀
   const userJoined = (data) => {
     const { name } = data;
+    users[room].append(name);
     setUsers((prevUsers) => [...prevUsers, name]);
   };
 
+  // 안 씀
   const userLeft = (data) => {
     const { name } = data;
     setUsers((prevUsers) => prevUsers.filter((user) => user !== name));
@@ -72,7 +77,7 @@ export default function App() {
   const handleChangeName = (newName) => {
     socket.emit('change:name', { name: newName }, (result) => {
       if (!result) {
-        return alert('같은 아이디가 있습니다. 다른 아이디로 만들어주세요.');
+        return alert('동일한 아이디가 이미 존재합니다. 다른 아이디로 만들어주세요.');
       }
 
       setUsers((prevUsers) => [...prevUsers, newName]);
@@ -92,13 +97,14 @@ export default function App() {
         filteredRooms={filteredRooms} 
         handleSearchRooms={handleSearchRooms}
         setSelectedRoom={setSelectedRoom}
+        user={user}
       />
       {selectedRoom ? 
         (
           <ChatApp socket={socket} room={selectedRoom} users={users} user={user} />
         ) : 
         (
-          <div>채팅방이 없습니다.</div>
+          <div>현재 입장된 채팅방이 없습니다.</div>
         )}
     </div>
   );

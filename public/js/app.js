@@ -82,6 +82,8 @@ function App() {
   var textField = _useState72[0];
   var setTextField = _useState72[1];
 
+  console.log(users);
+
   (0, _react.useEffect)(function () {
     localStorage.setItem('rooms', JSON.stringify(rooms));
   }, [rooms]);
@@ -89,8 +91,11 @@ function App() {
   var userJoined = function userJoined(data) {
     var name = data.name;
 
+    users[room].append(name);
     setUsers(function (prevUsers) {
-      return [].concat(_toConsumableArray(prevUsers), [name]);
+      return [].concat(_toConsumableArray(prevUsers), [{
+        name: room
+      }]);
     });
   };
 
@@ -182,7 +187,7 @@ function App() {
     selectedRoom ? _react2['default'].createElement(_componentsChatAppJsx2['default'], { socket: socket, room: selectedRoom, users: users, user: user }) : _react2['default'].createElement(
       'div',
       null,
-      '채팅방이 없습니다.'
+      '현재 입장된 채팅방이 없습니다.'
     )
   );
 }

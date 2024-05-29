@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function ChattingList({ textField, setTextField, filteredRooms, handleSearchRooms, setSelectedRoom }) {
+export default function ChattingList({ textField, setTextField, filteredRooms, handleSearchRooms, setSelectedRoom, user }) {
     return (
       <div>
       <h1>채팅방 목록</h1>

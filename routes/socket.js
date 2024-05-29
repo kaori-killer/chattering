@@ -53,12 +53,14 @@ module.exports = function (socket) {
   var name = userNames.getGuestName();
 
   // send the new user their name and a list of users
+  // 필요없을 듯
   socket.emit('init', {
     name: name,
     users: userNames.get()
   });
 
   // notify other clients that a new user has joined
+  //  필요없을 듯
   socket.broadcast.emit('user:join', {
     name: name
   });

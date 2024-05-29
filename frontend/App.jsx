@@ -80,6 +80,8 @@ export default function App() {
       <div>
         <h1>회원가입 - {user}</h1>
         <ChangeNameForm onChangeName={handleChangeName} />
+        <h1>로그인 - {user}</h1>
+        <ChangeNameForm onChangeName={handleChangeName} />
       </div>
       <ChattingList 
         textField={textField} 

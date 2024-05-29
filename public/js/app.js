@@ -165,6 +165,13 @@ function App() {
         '회원가입 - ',
         user
       ),
+      _react2['default'].createElement(_componentsChangeNameFormJsx2['default'], { onChangeName: handleChangeName }),
+      _react2['default'].createElement(
+        'h1',
+        null,
+        '로그인 - ',
+        user
+      ),
       _react2['default'].createElement(_componentsChangeNameFormJsx2['default'], { onChangeName: handleChangeName })
     ),
     _react2['default'].createElement(_componentsChattingListJsx2['default'], {

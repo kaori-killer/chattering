@@ -65,7 +65,7 @@ function App() {
   var rooms = _useState42[0];
   var setRooms = _useState42[1];
 
-  var _useState5 = (0, _react.useState)({});
+  var _useState5 = (0, _react.useState)(JSON.parse(localStorage.getItem('usersByRoom')) || {});
 
   var _useState52 = _slicedToArray(_useState5, 2);
 
@@ -97,7 +97,8 @@ function App() {
 
   (0, _react.useEffect)(function () {
     localStorage.setItem('rooms', JSON.stringify(rooms));
-  }, [rooms]);
+    localStorage.setItem('usersByRoom', JSON.stringify(usersByRoom));
+  }, [rooms, usersByRoom]);
 
   var userChangedName = function userChangedName(data) {
     var oldName = data.oldName;

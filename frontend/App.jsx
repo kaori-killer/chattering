@@ -16,7 +16,7 @@ export default function App() {
   const [user, setUser] = useState('');
 
   const [rooms, setRooms] = useState(JSON.parse(localStorage.getItem('rooms')) || []);
-  const [usersByRoom, setUsersByRoom] = useState({});
+  const [usersByRoom, setUsersByRoom] = useState(JSON.parse(localStorage.getItem('usersByRoom')) || {});
 
   const [filteredRooms, setFilteredRooms] = useState(rooms);
   const [selectedRoom, setSelectedRoom] = useState(null);
@@ -26,7 +26,8 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem('rooms', JSON.stringify(rooms));
-  }, [rooms]);
+    localStorage.setItem('usersByRoom', JSON.stringify(usersByRoom));
+  }, [rooms, usersByRoom]);
 
   const userChangedName = (data) => {
     const { oldName, newName } = data;

@@ -364,13 +364,10 @@ function ChattingList(_ref) {
 
     setUsersByRoom(function (prevUsersByRoom) {
       if (!prevUsersByRoom[room]) {
-        // If the room doesn't exist, create it with the current user
         return _extends({}, prevUsersByRoom, _defineProperty({}, room, [user]));
       } else if (!prevUsersByRoom[room].includes(user)) {
-        // If the room exists but the user is not in it, add the user to the room
         return _extends({}, prevUsersByRoom, _defineProperty({}, room, [].concat(_toConsumableArray(prevUsersByRoom[room]), [user])));
       } else {
-        // If the room exists and the user is already in it, return the state unchanged
         return prevUsersByRoom;
       }
     });
@@ -579,7 +576,9 @@ var _react2 = _interopRequireDefault(_react);
 function UsersList(_ref) {
   var users = _ref.users;
 
-  _react2['default'].createElement(
+  console.log(users);
+
+  return _react2['default'].createElement(
     'div',
     { className: 'users' },
     _react2['default'].createElement(
@@ -590,7 +589,7 @@ function UsersList(_ref) {
     _react2['default'].createElement(
       'ul',
       null,
-      users || [].map(function (user, i) {
+      users.map(function (user, i) {
         return _react2['default'].createElement(
           'li',
           { key: i },

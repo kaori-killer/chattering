@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 import io from 'socket.io-client';
   
+import ChattingList from './components/ChattingList.jsx';
 import UsersList from './components/UsersList.jsx';
 import ChangeNameForm from './components/ChangeNameForm.jsx';
 import MessageList from './components/MessageList.jsx';
@@ -45,6 +46,7 @@ const ChatApp = ({ room }) => {
     setMessages((prevMessages) => [...prevMessages, message]);
   };
 
+  // 신규 등록
   const userJoined = (data) => {
     const { name } = data;
     setUsers((prevUsers) => [...prevUsers, name]);
@@ -67,8 +69,8 @@ const ChatApp = ({ room }) => {
     socket.emit('send:message', message);
   };
 
+  // 로그인
   const handleChangeName = (newName) => {
-    const oldName = user;
     socket.emit('change:name', { name: newName }, (result) => {
       if (!result) {
         return alert('There was an error changing your name');
@@ -115,35 +117,21 @@ export default function App() {
 
   return (
     <div>
-      <div>
-        <h1>채팅방 목록</h1>
-
-        <input
-          type="text"
-          placeholder="찾을 방"
-          value={textField}
-          onChange={(e) => setTextField(e.target.value)}
-        />
-        <button type="button" onClick={handleSearchRooms}>
-          검색
-        </button>
-
-        <ul>
-          {filteredRooms.map((room, index) => (
-            <li key={index}>
-              <span>{room}</span>
-              <button onClick={() => setSelectedRoom(room)}>입장하기</button>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div>
-        {selectedRoom ? (
+      <ChattingList 
+        textField={textField} 
+        setTextField={setTextField}
+        filteredRooms={filteredRooms} 
+        handleSearchRooms={handleSearchRooms}
+        setSelectedRoom={setSelectedRoom}
+      />
+      {selectedRoom ? 
+        (
           <ChatApp room={selectedRoom} />
-        ) : (
-          <div>채팅방을 선택해주세요</div>
+        ) : 
+        (
+          <div>채팅방이 없습니다.</div>
         )}
-      </div>
     </div>
   );
 }
+

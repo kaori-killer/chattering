@@ -1,52 +1,29 @@
-import React, { useState, useEffect } from 'react';
-
+import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
-  
+
 import ChattingList from './components/ChattingList.jsx';
-import UsersList from './components/UsersList.jsx';
 import ChangeNameForm from './components/ChangeNameForm.jsx';
-import MessageList from './components/MessageList.jsx';
-import MessageForm from './components/MessageForm.jsx';
+import ChatApp from './components/ChatApp.jsx';
 
-const socket = io.connect();
+export default function App() {
+  const socketRef = useRef();
+  if (!socketRef.current) {
+    socketRef.current = io.connect();
+  }
+  const socket = socketRef.current;
 
-const ChatApp = ({ room }) => {
   const [users, setUsers] = useState([]);
-  const [messages, setMessages] = useState(JSON.parse(localStorage.getItem('messages')) || []);
   const [user, setUser] = useState('');
 
-  const filteredMessages = messages.filter((message)=> message.room === room);
-  
+  const [rooms, setRooms] = useState(JSON.parse(localStorage.getItem('rooms')) || []);
+  const [filteredRooms, setFilteredRooms] = useState(rooms);
+  const [selectedRoom, setSelectedRoom] = useState(null);
+  const [textField, setTextField] = useState('');
+
   useEffect(() => {
-    socket.emit('join:room', room);
-    
-    socket.on('init', initialize);
-    socket.on('send:message', messageReceive);
-    socket.on('user:join', userJoined);
-    socket.on('user:left', userLeft);
-    socket.on('change:name', userChangedName);
-    
-    return () => {
-      localStorage.setItem('messages',  JSON.stringify(messages));
-      socket.off('init', initialize);
-      socket.off('send:message', messageReceive);
-      socket.off('user:join', userJoined);
-      socket.off('user:left', userLeft);
-      socket.off('change:name', userChangedName);
-    };
-  }, [room]);
+    localStorage.setItem('rooms', JSON.stringify(rooms));
+  }, [rooms]);
 
-  const initialize = (data) => {
-    const { users, name } = data;
-    setUsers(users);
-    setUser(name);
-  };
-
-  const messageReceive = (message) => {
-    setMessages((prevMessages) => [...prevMessages, message]);
-  };
-
-  // 신규 등록
   const userJoined = (data) => {
     const { name } = data;
     setUsers((prevUsers) => [...prevUsers, name]);
@@ -64,40 +41,17 @@ const ChatApp = ({ room }) => {
     );
   };
 
-  const handleMessageSubmit = (message) => {
-    setMessages((prevMessages) => [...prevMessages, message]);
-    socket.emit('send:message', message);
-  };
+  useEffect(() => {
+    socket.on('user:join', userJoined);
+    socket.on('user:left', userLeft);
+    socket.on('change:name', userChangedName);
 
-  // 로그인
-  const handleChangeName = (newName) => {
-    socket.emit('change:name', { name: newName }, (result) => {
-      if (!result) {
-        return alert('There was an error changing your name');
-      }
-
-      setUsers([...users, newName]);
-      setUser(newName);
-    });
-  };
-
-  return (
-    <div className='center'>
-      <UsersList users={users} />
-      <ChangeNameForm onChangeName={handleChangeName} />
-      <MessageList messages={filteredMessages} room={room} user={user} />
-      <MessageForm onMessageSubmit={handleMessageSubmit} user={user} room={room} />
-    </div>
-  );
-};
-
-export default function App() {
-  const [rooms, setRooms] = useState(JSON.parse(localStorage.getItem('rooms')) || []);
-  const [filteredRooms, setFilteredRooms] = useState(JSON.parse(localStorage.getItem('rooms')) || []);
-  const [selectedRoom, setSelectedRoom] = useState(null);
-  const [textField, setTextField] = useState('');
-
-  localStorage.setItem('rooms',  JSON.stringify(rooms));
+    return () => {
+      socket.off('user:join', userJoined);
+      socket.off('user:left', userLeft);
+      socket.off('change:name', userChangedName);
+    };
+  }, [socket]);
 
   const handleSearchRooms = () => {
     const filtered = rooms.filter((room) => room.includes(textField));
@@ -105,7 +59,7 @@ export default function App() {
     if (filtered.length > 0) {
       setFilteredRooms(filtered);
     } else {
-      const createNewRoom = confirm("방을 새로 만드시겠습니까?");
+      const createNewRoom = window.confirm("방을 새로 만드시겠습니까?");
       if (createNewRoom) {
         const newRooms = [...rooms, textField];
         setRooms(newRooms);
@@ -115,8 +69,23 @@ export default function App() {
     }
   };
 
+  const handleChangeName = (newName) => {
+    socket.emit('change:name', { name: newName }, (result) => {
+      if (!result) {
+        return alert('같은 아이디가 있습니다. 다른 아이디로 만들어주세요.');
+      }
+
+      setUsers((prevUsers) => [...prevUsers, newName]);
+      setUser(newName);
+    });
+  };
+
   return (
     <div>
+      <div>
+        <h1>회원가입 - {user}</h1>
+        <ChangeNameForm onChangeName={handleChangeName} />
+      </div>
       <ChattingList 
         textField={textField} 
         setTextField={setTextField}
@@ -126,7 +95,7 @@ export default function App() {
       />
       {selectedRoom ? 
         (
-          <ChatApp room={selectedRoom} />
+          <ChatApp socket={socket} room={selectedRoom} users={users} user={user} />
         ) : 
         (
           <div>채팅방이 없습니다.</div>
@@ -134,4 +103,3 @@ export default function App() {
     </div>
   );
 }
-

@@ -25,26 +25,20 @@ var _componentsChattingListJsx = require('./components/ChattingList.jsx');
 
 var _componentsChattingListJsx2 = _interopRequireDefault(_componentsChattingListJsx);
 
-var _componentsUsersListJsx = require('./components/UsersList.jsx');
-
-var _componentsUsersListJsx2 = _interopRequireDefault(_componentsUsersListJsx);
-
 var _componentsChangeNameFormJsx = require('./components/ChangeNameForm.jsx');
 
 var _componentsChangeNameFormJsx2 = _interopRequireDefault(_componentsChangeNameFormJsx);
 
-var _componentsMessageListJsx = require('./components/MessageList.jsx');
+var _componentsChatAppJsx = require('./components/ChatApp.jsx');
 
-var _componentsMessageListJsx2 = _interopRequireDefault(_componentsMessageListJsx);
+var _componentsChatAppJsx2 = _interopRequireDefault(_componentsChatAppJsx);
 
-var _componentsMessageFormJsx = require('./components/MessageForm.jsx');
-
-var _componentsMessageFormJsx2 = _interopRequireDefault(_componentsMessageFormJsx);
-
-var socket = _socketIoClient2['default'].connect();
-
-var ChatApp = function ChatApp(_ref) {
-  var room = _ref.room;
+function App() {
+  var socketRef = (0, _react.useRef)();
+  if (!socketRef.current) {
+    socketRef.current = _socketIoClient2['default'].connect();
+  }
+  var socket = socketRef.current;
 
   var _useState = (0, _react.useState)([]);
 
@@ -53,58 +47,45 @@ var ChatApp = function ChatApp(_ref) {
   var users = _useState2[0];
   var setUsers = _useState2[1];
 
-  var _useState3 = (0, _react.useState)(JSON.parse(localStorage.getItem('messages')) || []);
+  var _useState3 = (0, _react.useState)('');
 
   var _useState32 = _slicedToArray(_useState3, 2);
 
-  var messages = _useState32[0];
-  var setMessages = _useState32[1];
+  var user = _useState32[0];
+  var setUser = _useState32[1];
 
-  var _useState4 = (0, _react.useState)('');
+  var _useState4 = (0, _react.useState)(JSON.parse(localStorage.getItem('rooms')) || []);
 
   var _useState42 = _slicedToArray(_useState4, 2);
 
-  var user = _useState42[0];
-  var setUser = _useState42[1];
+  var rooms = _useState42[0];
+  var setRooms = _useState42[1];
 
-  var filteredMessages = messages.filter(function (message) {
-    return message.room === room;
-  });
+  var _useState5 = (0, _react.useState)(rooms);
+
+  var _useState52 = _slicedToArray(_useState5, 2);
+
+  var filteredRooms = _useState52[0];
+  var setFilteredRooms = _useState52[1];
+
+  var _useState6 = (0, _react.useState)(null);
+
+  var _useState62 = _slicedToArray(_useState6, 2);
+
+  var selectedRoom = _useState62[0];
+  var setSelectedRoom = _useState62[1];
+
+  var _useState7 = (0, _react.useState)('');
+
+  var _useState72 = _slicedToArray(_useState7, 2);
+
+  var textField = _useState72[0];
+  var setTextField = _useState72[1];
 
   (0, _react.useEffect)(function () {
-    socket.emit('join:room', room);
+    localStorage.setItem('rooms', JSON.stringify(rooms));
+  }, [rooms]);
 
-    socket.on('init', initialize);
-    socket.on('send:message', messageReceive);
-    socket.on('user:join', userJoined);
-    socket.on('user:left', userLeft);
-    socket.on('change:name', userChangedName);
-
-    return function () {
-      localStorage.setItem('messages', JSON.stringify(messages));
-      socket.off('init', initialize);
-      socket.off('send:message', messageReceive);
-      socket.off('user:join', userJoined);
-      socket.off('user:left', userLeft);
-      socket.off('change:name', userChangedName);
-    };
-  }, [room]);
-
-  var initialize = function initialize(data) {
-    var users = data.users;
-    var name = data.name;
-
-    setUsers(users);
-    setUser(name);
-  };
-
-  var messageReceive = function messageReceive(message) {
-    setMessages(function (prevMessages) {
-      return [].concat(_toConsumableArray(prevMessages), [message]);
-    });
-  };
-
-  // 신규 등록
   var userJoined = function userJoined(data) {
     var name = data.name;
 
@@ -134,65 +115,17 @@ var ChatApp = function ChatApp(_ref) {
     });
   };
 
-  var handleMessageSubmit = function handleMessageSubmit(message) {
-    setMessages(function (prevMessages) {
-      return [].concat(_toConsumableArray(prevMessages), [message]);
-    });
-    socket.emit('send:message', message);
-  };
+  (0, _react.useEffect)(function () {
+    socket.on('user:join', userJoined);
+    socket.on('user:left', userLeft);
+    socket.on('change:name', userChangedName);
 
-  // 로그인
-  var handleChangeName = function handleChangeName(newName) {
-    socket.emit('change:name', { name: newName }, function (result) {
-      if (!result) {
-        return alert('There was an error changing your name');
-      }
-
-      setUsers([].concat(_toConsumableArray(users), [newName]));
-      setUser(newName);
-    });
-  };
-
-  return _react2['default'].createElement(
-    'div',
-    { className: 'center' },
-    _react2['default'].createElement(_componentsUsersListJsx2['default'], { users: users }),
-    _react2['default'].createElement(_componentsChangeNameFormJsx2['default'], { onChangeName: handleChangeName }),
-    _react2['default'].createElement(_componentsMessageListJsx2['default'], { messages: filteredMessages, room: room, user: user }),
-    _react2['default'].createElement(_componentsMessageFormJsx2['default'], { onMessageSubmit: handleMessageSubmit, user: user, room: room })
-  );
-};
-
-function App() {
-  var _useState5 = (0, _react.useState)(JSON.parse(localStorage.getItem('rooms')) || []);
-
-  var _useState52 = _slicedToArray(_useState5, 2);
-
-  var rooms = _useState52[0];
-  var setRooms = _useState52[1];
-
-  var _useState6 = (0, _react.useState)(JSON.parse(localStorage.getItem('rooms')) || []);
-
-  var _useState62 = _slicedToArray(_useState6, 2);
-
-  var filteredRooms = _useState62[0];
-  var setFilteredRooms = _useState62[1];
-
-  var _useState7 = (0, _react.useState)(null);
-
-  var _useState72 = _slicedToArray(_useState7, 2);
-
-  var selectedRoom = _useState72[0];
-  var setSelectedRoom = _useState72[1];
-
-  var _useState8 = (0, _react.useState)('');
-
-  var _useState82 = _slicedToArray(_useState8, 2);
-
-  var textField = _useState82[0];
-  var setTextField = _useState82[1];
-
-  localStorage.setItem('rooms', JSON.stringify(rooms));
+    return function () {
+      socket.off('user:join', userJoined);
+      socket.off('user:left', userLeft);
+      socket.off('change:name', userChangedName);
+    };
+  }, [socket]);
 
   var handleSearchRooms = function handleSearchRooms() {
     var filtered = rooms.filter(function (room) {
@@ -202,7 +135,7 @@ function App() {
     if (filtered.length > 0) {
       setFilteredRooms(filtered);
     } else {
-      var createNewRoom = confirm("방을 새로 만드시겠습니까?");
+      var createNewRoom = window.confirm("방을 새로 만드시겠습니까?");
       if (createNewRoom) {
         var newRooms = [].concat(_toConsumableArray(rooms), [textField]);
         setRooms(newRooms);
@@ -212,9 +145,33 @@ function App() {
     }
   };
 
+  var handleChangeName = function handleChangeName(newName) {
+    socket.emit('change:name', { name: newName }, function (result) {
+      if (!result) {
+        return alert('같은 아이디가 있습니다. 다른 아이디로 만들어주세요.');
+      }
+
+      setUsers(function (prevUsers) {
+        return [].concat(_toConsumableArray(prevUsers), [newName]);
+      });
+      setUser(newName);
+    });
+  };
+
   return _react2['default'].createElement(
     'div',
     null,
+    _react2['default'].createElement(
+      'div',
+      null,
+      _react2['default'].createElement(
+        'h1',
+        null,
+        '회원가입 - ',
+        user
+      ),
+      _react2['default'].createElement(_componentsChangeNameFormJsx2['default'], { onChangeName: handleChangeName })
+    ),
     _react2['default'].createElement(_componentsChattingListJsx2['default'], {
       textField: textField,
       setTextField: setTextField,
@@ -222,7 +179,7 @@ function App() {
       handleSearchRooms: handleSearchRooms,
       setSelectedRoom: setSelectedRoom
     }),
-    selectedRoom ? _react2['default'].createElement(ChatApp, { room: selectedRoom }) : _react2['default'].createElement(
+    selectedRoom ? _react2['default'].createElement(_componentsChatAppJsx2['default'], { socket: socket, room: selectedRoom, users: users, user: user }) : _react2['default'].createElement(
       'div',
       null,
       '채팅방이 없습니다.'
@@ -232,7 +189,7 @@ function App() {
 
 module.exports = exports['default'];
 
-},{"./components/ChangeNameForm.jsx":2,"./components/ChattingList.jsx":3,"./components/MessageForm.jsx":5,"./components/MessageList.jsx":6,"./components/UsersList.jsx":7,"react":48,"socket.io-client":52}],2:[function(require,module,exports){
+},{"./components/ChangeNameForm.jsx":2,"./components/ChatApp.jsx":3,"./components/ChattingList.jsx":4,"react":49,"socket.io-client":53}],2:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -288,7 +245,93 @@ var ChangeNameForm = function ChangeNameForm(_ref) {
 exports['default'] = ChangeNameForm;
 module.exports = exports['default'];
 
-},{"react":48}],3:[function(require,module,exports){
+},{"react":49}],3:[function(require,module,exports){
+'use strict';
+
+Object.defineProperty(exports, '__esModule', {
+  value: true
+});
+
+var _slicedToArray = (function () { function sliceIterator(arr, i) { var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i['return']) _i['return'](); } finally { if (_d) throw _e; } } return _arr; } return function (arr, i) { if (Array.isArray(arr)) { return arr; } else if (Symbol.iterator in Object(arr)) { return sliceIterator(arr, i); } else { throw new TypeError('Invalid attempt to destructure non-iterable instance'); } }; })();
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
+
+var _react = require('react');
+
+var _react2 = _interopRequireDefault(_react);
+
+var _socketIoClient = require('socket.io-client');
+
+var _socketIoClient2 = _interopRequireDefault(_socketIoClient);
+
+var _UsersListJsx = require('./UsersList.jsx');
+
+var _UsersListJsx2 = _interopRequireDefault(_UsersListJsx);
+
+var _MessageListJsx = require('./MessageList.jsx');
+
+var _MessageListJsx2 = _interopRequireDefault(_MessageListJsx);
+
+var _MessageFormJsx = require('./MessageForm.jsx');
+
+var _MessageFormJsx2 = _interopRequireDefault(_MessageFormJsx);
+
+var socket = _socketIoClient2['default'].connect();
+
+var ChatApp = function ChatApp(_ref) {
+  var room = _ref.room;
+  var users = _ref.users;
+  var user = _ref.user;
+
+  var _useState = (0, _react.useState)(JSON.parse(localStorage.getItem('messages')) || []);
+
+  var _useState2 = _slicedToArray(_useState, 2);
+
+  var messages = _useState2[0];
+  var setMessages = _useState2[1];
+
+  var filteredMessages = messages.filter(function (message) {
+    return message.room === room;
+  });
+
+  (0, _react.useEffect)(function () {
+    socket.emit('join:room', room);
+    socket.on('send:message', messageReceive);
+
+    return function () {
+      localStorage.setItem('messages', JSON.stringify(messages));
+      socket.off('send:message', messageReceive);
+    };
+  }, [room]);
+
+  var messageReceive = function messageReceive(message) {
+    setMessages(function (prevMessages) {
+      return [].concat(_toConsumableArray(prevMessages), [message]);
+    });
+  };
+
+  var handleMessageSubmit = function handleMessageSubmit(message) {
+    setMessages(function (prevMessages) {
+      return [].concat(_toConsumableArray(prevMessages), [message]);
+    });
+    socket.emit('send:message', message);
+  };
+
+  return _react2['default'].createElement(
+    'div',
+    { className: 'center' },
+    _react2['default'].createElement(_UsersListJsx2['default'], { users: users }),
+    _react2['default'].createElement(_MessageListJsx2['default'], { messages: filteredMessages, room: room, user: user }),
+    _react2['default'].createElement(_MessageFormJsx2['default'], { onMessageSubmit: handleMessageSubmit, user: user, room: room })
+  );
+};
+
+exports['default'] = ChatApp;
+module.exports = exports['default'];
+
+},{"./MessageForm.jsx":6,"./MessageList.jsx":7,"./UsersList.jsx":8,"react":49,"socket.io-client":53}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -357,7 +400,7 @@ function ChattingList(_ref) {
 
 module.exports = exports["default"];
 
-},{"react":48}],4:[function(require,module,exports){
+},{"react":49}],5:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -395,7 +438,7 @@ function Message(_ref) {
 
 module.exports = exports['default'];
 
-},{"react":48}],5:[function(require,module,exports){
+},{"react":49}],6:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -451,7 +494,7 @@ var MessageForm = function MessageForm(_ref) {
 exports['default'] = MessageForm;
 module.exports = exports['default'];
 
-},{"react":48}],6:[function(require,module,exports){
+},{"react":49}],7:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -495,7 +538,7 @@ var MessageList = function MessageList(_ref) {
 exports['default'] = MessageList;
 module.exports = exports['default'];
 
-},{"./Message.jsx":4,"react":48}],7:[function(require,module,exports){
+},{"./Message.jsx":5,"react":49}],8:[function(require,module,exports){
 'use strict';
 
 Object.defineProperty(exports, '__esModule', {
@@ -535,7 +578,7 @@ var UsersList = function UsersList(_ref) {
 exports['default'] = UsersList;
 module.exports = exports['default'];
 
-},{"react":48}],8:[function(require,module,exports){
+},{"react":49}],9:[function(require,module,exports){
 'use strict';
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
@@ -565,7 +608,7 @@ function main() {
 
 main();
 
-},{"./App.jsx":1,"react":48,"react-dom/client":44}],9:[function(require,module,exports){
+},{"./App.jsx":1,"react":49,"react-dom/client":45}],10:[function(require,module,exports){
 module.exports = after
 
 function after(count, callback, err_cb) {
@@ -595,7 +638,7 @@ function after(count, callback, err_cb) {
 
 function noop() {}
 
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 /**
  * An abstraction for slicing an arraybuffer even when
  * ArrayBuffer.prototype.slice is not supported
@@ -626,7 +669,7 @@ module.exports = function(arraybuffer, start, end) {
   return result.buffer;
 };
 
-},{}],11:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 
 /**
  * Expose `Backoff`.
@@ -713,7 +756,7 @@ Backoff.prototype.setJitter = function(jitter){
 };
 
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 /*
  * base64-arraybuffer
  * https://github.com/niklasvh/base64-arraybuffer
@@ -782,7 +825,7 @@ Backoff.prototype.setJitter = function(jitter){
   };
 })();
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 (function (global){
 /**
  * Create a blob builder even when vendor prefixes exist
@@ -882,9 +925,9 @@ module.exports = (function() {
 })();
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],14:[function(require,module,exports){
-
 },{}],15:[function(require,module,exports){
+
+},{}],16:[function(require,module,exports){
 /**
  * Slice reference.
  */
@@ -909,7 +952,7 @@ module.exports = function(obj, fn){
   }
 };
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -1074,7 +1117,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 
 module.exports = function(a, b){
   var fn = function(){};
@@ -1082,11 +1125,11 @@ module.exports = function(a, b){
   a.prototype = new fn;
   a.prototype.constructor = a;
 };
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 
 module.exports = require('./lib/index');
 
-},{"./lib/index":19}],19:[function(require,module,exports){
+},{"./lib/index":20}],20:[function(require,module,exports){
 
 module.exports = require('./socket');
 
@@ -1098,7 +1141,7 @@ module.exports = require('./socket');
  */
 module.exports.parser = require('engine.io-parser');
 
-},{"./socket":20,"engine.io-parser":31}],20:[function(require,module,exports){
+},{"./socket":21,"engine.io-parser":32}],21:[function(require,module,exports){
 (function (global){
 /**
  * Module dependencies.
@@ -1840,7 +1883,7 @@ Socket.prototype.filterUpgrades = function (upgrades) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./transport":21,"./transports/index":22,"component-emitter":16,"debug":28,"engine.io-parser":31,"indexof":35,"parsejson":38,"parseqs":39,"parseuri":40}],21:[function(require,module,exports){
+},{"./transport":22,"./transports/index":23,"component-emitter":17,"debug":29,"engine.io-parser":32,"indexof":36,"parsejson":39,"parseqs":40,"parseuri":41}],22:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -1999,7 +2042,7 @@ Transport.prototype.onClose = function () {
   this.emit('close');
 };
 
-},{"component-emitter":16,"engine.io-parser":31}],22:[function(require,module,exports){
+},{"component-emitter":17,"engine.io-parser":32}],23:[function(require,module,exports){
 (function (global){
 /**
  * Module dependencies
@@ -2056,7 +2099,7 @@ function polling (opts) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./polling-jsonp":23,"./polling-xhr":24,"./websocket":26,"xmlhttprequest-ssl":27}],23:[function(require,module,exports){
+},{"./polling-jsonp":24,"./polling-xhr":25,"./websocket":27,"xmlhttprequest-ssl":28}],24:[function(require,module,exports){
 (function (global){
 
 /**
@@ -2291,7 +2334,7 @@ JSONPPolling.prototype.doWrite = function (data, fn) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./polling":25,"component-inherit":17}],24:[function(require,module,exports){
+},{"./polling":26,"component-inherit":18}],25:[function(require,module,exports){
 (function (global){
 /**
  * Module requirements.
@@ -2719,7 +2762,7 @@ function unloadHandler () {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./polling":25,"component-emitter":16,"component-inherit":17,"debug":28,"xmlhttprequest-ssl":27}],25:[function(require,module,exports){
+},{"./polling":26,"component-emitter":17,"component-inherit":18,"debug":29,"xmlhttprequest-ssl":28}],26:[function(require,module,exports){
 /**
  * Module dependencies.
  */
@@ -2966,7 +3009,7 @@ Polling.prototype.uri = function () {
   return schema + '://' + (ipv6 ? '[' + this.hostname + ']' : this.hostname) + port + this.path + query;
 };
 
-},{"../transport":21,"component-inherit":17,"debug":28,"engine.io-parser":31,"parseqs":39,"xmlhttprequest-ssl":27,"yeast":69}],26:[function(require,module,exports){
+},{"../transport":22,"component-inherit":18,"debug":29,"engine.io-parser":32,"parseqs":40,"xmlhttprequest-ssl":28,"yeast":70}],27:[function(require,module,exports){
 (function (global){
 /**
  * Module dependencies.
@@ -3255,7 +3298,7 @@ WS.prototype.check = function () {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"../transport":21,"component-inherit":17,"debug":28,"engine.io-parser":31,"parseqs":39,"ws":14,"yeast":69}],27:[function(require,module,exports){
+},{"../transport":22,"component-inherit":18,"debug":29,"engine.io-parser":32,"parseqs":40,"ws":15,"yeast":70}],28:[function(require,module,exports){
 (function (global){
 // browser shim for xmlhttprequest module
 
@@ -3296,7 +3339,7 @@ module.exports = function (opts) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"has-cors":34}],28:[function(require,module,exports){
+},{"has-cors":35}],29:[function(require,module,exports){
 (function (process){
 
 /**
@@ -3477,7 +3520,7 @@ function localstorage(){
 }
 
 }).call(this,require('_process'))
-},{"./debug":29,"_process":41}],29:[function(require,module,exports){
+},{"./debug":30,"_process":42}],30:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -3679,7 +3722,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":30}],30:[function(require,module,exports){
+},{"ms":31}],31:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -3830,7 +3873,7 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's'
 }
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 (function (global){
 /**
  * Module dependencies.
@@ -4443,7 +4486,7 @@ exports.decodePayloadAsBinary = function (data, binaryType, callback) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./keys":32,"after":9,"arraybuffer.slice":10,"base64-arraybuffer":12,"blob":13,"has-binary":33,"wtf-8":68}],32:[function(require,module,exports){
+},{"./keys":33,"after":10,"arraybuffer.slice":11,"base64-arraybuffer":13,"blob":14,"has-binary":34,"wtf-8":69}],33:[function(require,module,exports){
 
 /**
  * Gets the keys for an object.
@@ -4464,7 +4507,7 @@ module.exports = Object.keys || function keys (obj){
   return arr;
 };
 
-},{}],33:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 (function (global){
 
 /*
@@ -4527,7 +4570,7 @@ function hasBinary(data) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"isarray":36}],34:[function(require,module,exports){
+},{"isarray":37}],35:[function(require,module,exports){
 
 /**
  * Module exports.
@@ -4546,7 +4589,7 @@ try {
   module.exports = false;
 }
 
-},{}],35:[function(require,module,exports){
+},{}],36:[function(require,module,exports){
 
 var indexOf = [].indexOf;
 
@@ -4557,12 +4600,12 @@ module.exports = function(arr, obj){
   }
   return -1;
 };
-},{}],36:[function(require,module,exports){
+},{}],37:[function(require,module,exports){
 module.exports = Array.isArray || function (arr) {
   return Object.prototype.toString.call(arr) == '[object Array]';
 };
 
-},{}],37:[function(require,module,exports){
+},{}],38:[function(require,module,exports){
 (function (global){
 /*! JSON v3.3.2 | http://bestiejs.github.io/json3 | Copyright 2012-2014, Kit Cambridge | http://kit.mit-license.org */
 ;(function () {
@@ -5468,7 +5511,7 @@ module.exports = Array.isArray || function (arr) {
 }).call(this);
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],38:[function(require,module,exports){
+},{}],39:[function(require,module,exports){
 (function (global){
 /**
  * JSON parse.
@@ -5503,7 +5546,7 @@ module.exports = function parsejson(data) {
   }
 };
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],39:[function(require,module,exports){
+},{}],40:[function(require,module,exports){
 /**
  * Compiles a querystring
  * Returns string representation of the object
@@ -5542,7 +5585,7 @@ exports.decode = function(qs){
   return qry;
 };
 
-},{}],40:[function(require,module,exports){
+},{}],41:[function(require,module,exports){
 /**
  * Parses an URI
  *
@@ -5583,7 +5626,7 @@ module.exports = function parseuri(str) {
     return uri;
 };
 
-},{}],41:[function(require,module,exports){
+},{}],42:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -5769,7 +5812,7 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],42:[function(require,module,exports){
+},{}],43:[function(require,module,exports){
 (function (process){
 /**
  * @license React
@@ -35696,7 +35739,7 @@ if (
 }
 
 }).call(this,require('_process'))
-},{"_process":41,"react":48,"scheduler":51}],43:[function(require,module,exports){
+},{"_process":42,"react":49,"scheduler":52}],44:[function(require,module,exports){
 /**
  * @license React
  * react-dom.production.min.js
@@ -36020,7 +36063,7 @@ exports.hydrateRoot=function(a,b,c){if(!nl(a))throw Error(p(405));var d=null!=c&
 e);return new ml(b)};exports.render=function(a,b,c){if(!ol(b))throw Error(p(200));return rl(null,a,b,!1,c)};exports.unmountComponentAtNode=function(a){if(!ol(a))throw Error(p(40));return a._reactRootContainer?(Rk(function(){rl(null,null,a,!1,function(){a._reactRootContainer=null;a[uf]=null})}),!0):!1};exports.unstable_batchedUpdates=Qk;
 exports.unstable_renderSubtreeIntoContainer=function(a,b,c,d){if(!ol(c))throw Error(p(200));if(null==a||void 0===a._reactInternals)throw Error(p(38));return rl(a,b,c,!1,d)};exports.version="18.3.1-next-f1338f8080-20240426";
 
-},{"react":48,"scheduler":51}],44:[function(require,module,exports){
+},{"react":49,"scheduler":52}],45:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -36049,7 +36092,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 }).call(this,require('_process'))
-},{"_process":41,"react-dom":45}],45:[function(require,module,exports){
+},{"_process":42,"react-dom":46}],46:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -36091,7 +36134,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 }).call(this,require('_process'))
-},{"./cjs/react-dom.development.js":42,"./cjs/react-dom.production.min.js":43,"_process":41}],46:[function(require,module,exports){
+},{"./cjs/react-dom.development.js":43,"./cjs/react-dom.production.min.js":44,"_process":42}],47:[function(require,module,exports){
 (function (process){
 /**
  * @license React
@@ -38835,7 +38878,7 @@ if (
 }
 
 }).call(this,require('_process'))
-},{"_process":41}],47:[function(require,module,exports){
+},{"_process":42}],48:[function(require,module,exports){
 /**
  * @license React
  * react.production.min.js
@@ -38863,7 +38906,7 @@ exports.forwardRef=function(a){return{$$typeof:v,render:a}};exports.isValidEleme
 exports.useDebugValue=function(){};exports.useDeferredValue=function(a){return U.current.useDeferredValue(a)};exports.useEffect=function(a,b){return U.current.useEffect(a,b)};exports.useId=function(){return U.current.useId()};exports.useImperativeHandle=function(a,b,e){return U.current.useImperativeHandle(a,b,e)};exports.useInsertionEffect=function(a,b){return U.current.useInsertionEffect(a,b)};exports.useLayoutEffect=function(a,b){return U.current.useLayoutEffect(a,b)};
 exports.useMemo=function(a,b){return U.current.useMemo(a,b)};exports.useReducer=function(a,b,e){return U.current.useReducer(a,b,e)};exports.useRef=function(a){return U.current.useRef(a)};exports.useState=function(a){return U.current.useState(a)};exports.useSyncExternalStore=function(a,b,e){return U.current.useSyncExternalStore(a,b,e)};exports.useTransition=function(){return U.current.useTransition()};exports.version="18.3.1";
 
-},{}],48:[function(require,module,exports){
+},{}],49:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -38874,7 +38917,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 }).call(this,require('_process'))
-},{"./cjs/react.development.js":46,"./cjs/react.production.min.js":47,"_process":41}],49:[function(require,module,exports){
+},{"./cjs/react.development.js":47,"./cjs/react.production.min.js":48,"_process":42}],50:[function(require,module,exports){
 (function (process){
 /**
  * @license React
@@ -39512,7 +39555,7 @@ if (
 }
 
 }).call(this,require('_process'))
-},{"_process":41}],50:[function(require,module,exports){
+},{"_process":42}],51:[function(require,module,exports){
 /**
  * @license React
  * scheduler.production.min.js
@@ -39533,7 +39576,7 @@ exports.unstable_requestPaint=function(){};exports.unstable_runWithPriority=func
 exports.unstable_scheduleCallback=function(a,b,c){var d=exports.unstable_now();"object"===typeof c&&null!==c?(c=c.delay,c="number"===typeof c&&0<c?d+c:d):c=d;switch(a){case 1:var e=-1;break;case 2:e=250;break;case 5:e=1073741823;break;case 4:e=1E4;break;default:e=5E3}e=c+e;a={id:u++,callback:b,priorityLevel:a,startTime:c,expirationTime:e,sortIndex:-1};c>d?(a.sortIndex=c,f(t,a),null===h(r)&&a===h(t)&&(B?(E(L),L=-1):B=!0,K(H,c-d))):(a.sortIndex=e,f(r,a),A||z||(A=!0,I(J)));return a};
 exports.unstable_shouldYield=M;exports.unstable_wrapCallback=function(a){var b=y;return function(){var c=y;y=b;try{return a.apply(this,arguments)}finally{y=c}}};
 
-},{}],51:[function(require,module,exports){
+},{}],52:[function(require,module,exports){
 (function (process){
 'use strict';
 
@@ -39544,7 +39587,7 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 }).call(this,require('_process'))
-},{"./cjs/scheduler.development.js":49,"./cjs/scheduler.production.min.js":50,"_process":41}],52:[function(require,module,exports){
+},{"./cjs/scheduler.development.js":50,"./cjs/scheduler.production.min.js":51,"_process":42}],53:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -39655,7 +39698,7 @@ exports.connect = lookup;
 exports.Manager = require('./manager');
 exports.Socket = require('./socket');
 
-},{"./manager":53,"./socket":55,"./url":56,"debug":57,"socket.io-parser":61}],53:[function(require,module,exports){
+},{"./manager":54,"./socket":56,"./url":57,"debug":58,"socket.io-parser":62}],54:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -40217,7 +40260,7 @@ Manager.prototype.onreconnect = function () {
   this.emitAll('reconnect', attempt);
 };
 
-},{"./on":54,"./socket":55,"backo2":11,"component-bind":15,"component-emitter":16,"debug":57,"engine.io-client":18,"indexof":35,"socket.io-parser":61}],54:[function(require,module,exports){
+},{"./on":55,"./socket":56,"backo2":12,"component-bind":16,"component-emitter":17,"debug":58,"engine.io-client":19,"indexof":36,"socket.io-parser":62}],55:[function(require,module,exports){
 
 /**
  * Module exports.
@@ -40243,7 +40286,7 @@ function on (obj, ev, fn) {
   };
 }
 
-},{}],55:[function(require,module,exports){
+},{}],56:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -40664,7 +40707,7 @@ Socket.prototype.compress = function (compress) {
   return this;
 };
 
-},{"./on":54,"component-bind":15,"component-emitter":16,"debug":57,"has-binary":33,"socket.io-parser":61,"to-array":67}],56:[function(require,module,exports){
+},{"./on":55,"component-bind":16,"component-emitter":17,"debug":58,"has-binary":34,"socket.io-parser":62,"to-array":68}],57:[function(require,module,exports){
 (function (global){
 
 /**
@@ -40743,13 +40786,13 @@ function url (uri, loc) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"debug":57,"parseuri":40}],57:[function(require,module,exports){
-arguments[4][28][0].apply(exports,arguments)
-},{"./debug":58,"_process":41,"dup":28}],58:[function(require,module,exports){
+},{"debug":58,"parseuri":41}],58:[function(require,module,exports){
 arguments[4][29][0].apply(exports,arguments)
-},{"dup":29,"ms":59}],59:[function(require,module,exports){
+},{"./debug":59,"_process":42,"dup":29}],59:[function(require,module,exports){
 arguments[4][30][0].apply(exports,arguments)
-},{"dup":30}],60:[function(require,module,exports){
+},{"dup":30,"ms":60}],60:[function(require,module,exports){
+arguments[4][31][0].apply(exports,arguments)
+},{"dup":31}],61:[function(require,module,exports){
 (function (global){
 /*global Blob,File*/
 
@@ -40894,7 +40937,7 @@ exports.removeBlobs = function(data, callback) {
 };
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"./is-buffer":62,"isarray":36}],61:[function(require,module,exports){
+},{"./is-buffer":63,"isarray":37}],62:[function(require,module,exports){
 
 /**
  * Module dependencies.
@@ -41300,7 +41343,7 @@ function error(data){
   };
 }
 
-},{"./binary":60,"./is-buffer":62,"component-emitter":63,"debug":64,"json3":37}],62:[function(require,module,exports){
+},{"./binary":61,"./is-buffer":63,"component-emitter":64,"debug":65,"json3":38}],63:[function(require,module,exports){
 (function (global){
 
 module.exports = isBuf;
@@ -41317,7 +41360,7 @@ function isBuf(obj) {
 }
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],63:[function(require,module,exports){
+},{}],64:[function(require,module,exports){
 
 /**
  * Expose `Emitter`.
@@ -41483,7 +41526,7 @@ Emitter.prototype.hasListeners = function(event){
   return !! this.listeners(event).length;
 };
 
-},{}],64:[function(require,module,exports){
+},{}],65:[function(require,module,exports){
 
 /**
  * This is the web browser implementation of `debug()`.
@@ -41653,7 +41696,7 @@ function localstorage(){
   } catch (e) {}
 }
 
-},{"./debug":65}],65:[function(require,module,exports){
+},{"./debug":66}],66:[function(require,module,exports){
 
 /**
  * This is the common logic for both the Node.js and web browser
@@ -41852,7 +41895,7 @@ function coerce(val) {
   return val;
 }
 
-},{"ms":66}],66:[function(require,module,exports){
+},{"ms":67}],67:[function(require,module,exports){
 /**
  * Helpers.
  */
@@ -41979,7 +42022,7 @@ function plural(ms, n, name) {
   return Math.ceil(ms / n) + ' ' + name + 's';
 }
 
-},{}],67:[function(require,module,exports){
+},{}],68:[function(require,module,exports){
 module.exports = toArray
 
 function toArray(list, index) {
@@ -41994,7 +42037,7 @@ function toArray(list, index) {
     return array
 }
 
-},{}],68:[function(require,module,exports){
+},{}],69:[function(require,module,exports){
 (function (global){
 /*! https://mths.be/wtf8 v1.0.0 by @mathias */
 ;(function(root) {
@@ -42232,7 +42275,7 @@ function toArray(list, index) {
 }(this));
 
 }).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{}],69:[function(require,module,exports){
+},{}],70:[function(require,module,exports){
 'use strict';
 
 var alphabet = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_'.split('')
@@ -42302,4 +42345,4 @@ yeast.encode = encode;
 yeast.decode = decode;
 module.exports = yeast;
 
-},{}]},{},[8]);
+},{}]},{},[9]);

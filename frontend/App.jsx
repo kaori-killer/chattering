@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 
+import styled from 'styled-components';
+
 import ChattingList from './components/ChattingList.jsx';
 import ChatApp from './components/ChatApp.jsx';
 import LoginForm from './components/LoginForm.jsx';
@@ -22,7 +24,9 @@ export default function App() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [textField, setTextField] = useState('');
 
-  console.log(users, usersByRoom);
+  const ErrorMessage = styled.p`
+    color: red;
+ `;
 
   useEffect(() => {
     localStorage.setItem('rooms', JSON.stringify(rooms));
@@ -81,7 +85,9 @@ export default function App() {
 
   return (
     <div>
+      <h1>인천대 채팅 애플리케이션 💬</h1>
       <LoginForm user={user} handleChangeName={handleChangeName} />
+      {user ? 
       <ChattingList 
         textField={textField} 
         setTextField={setTextField}
@@ -91,12 +97,18 @@ export default function App() {
         setUsersByRoom={setUsersByRoom}
         user={user}
       />
+      :
+      <br/>
+      }
       {selectedRoom ? 
         (
           <ChatApp socket={socket} room={selectedRoom} usersByRoom={usersByRoom} user={user} />
         ) : 
         (
-          <div>현재 입장된 채팅방이 없습니다.</div>
+          <div>
+            <hr/>
+            <ErrorMessage>현재 입장된 채팅방이 없습니다.</ErrorMessage>
+          </div>
         )}
     </div>
   );

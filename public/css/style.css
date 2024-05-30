@@ -5,8 +5,13 @@ body{
 	margin-top: 5%;
 }
 .users{
-	float : right;
-	margin-right: 30%;
+    float: right;
+    border: 1px solid black;
+    margin-right: 50px;
+    margin-bottom: 50px;
+    margin-left: 50px;
+	margin-top: 34px;
+    padding: 10px;
 }
 .messages {
 	width: 500px;
@@ -41,4 +46,8 @@ body{
 	margin-left: 3%;
 	width: 520px;
 	height: 40px;
+}
+
+#root {
+	text-align: center;
 }

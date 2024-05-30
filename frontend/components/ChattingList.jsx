@@ -1,5 +1,25 @@
 import React from 'react';
 
+import styled from 'styled-components';
+
+const Input = styled.input`
+    width: 150px;
+    height: 25px;
+`;
+
+const Button = styled.button`
+    height: 30px;
+    width: 59px;
+    background-color: #53BAD1;
+    border: none;
+    border-radius: 3px;
+    margin: 3px;
+`;
+
+const Li = styled.li`
+    list-style: none;
+`;
+
 export default function ChattingList({ textField, setTextField, filteredRooms, handleSearchRooms, setSelectedRoom, setUsersByRoom, user, usersByRoom }) {
   const handleEnterRoom = (room) => {
     if(!user){
@@ -21,24 +41,25 @@ export default function ChattingList({ textField, setTextField, filteredRooms, h
 
     return (
       <div>
-      <h1>채팅방 목록</h1>
+      <hr/>
+      <h2>{user}의 채팅방 목록 📝</h2>
   
-      <input
+      <Input
         type="text"
         placeholder="찾을 방"
         value={textField}
         onChange={(e) => setTextField(e.target.value)}
       />
-      <button type="button" onClick={handleSearchRooms}>
+      <Button type="button" onClick={handleSearchRooms}>
         검색
-      </button>
+      </Button>
   
       <ul>
         {filteredRooms.map((room, index) => (
-          <li key={index}>
+          <Li key={index}>
             <span>{room}</span>
-            <button onClick={() => handleEnterRoom(room)}>입장하기</button>
-          </li>
+            <Button onClick={() => handleEnterRoom(room)}>입장하기</Button>
+          </Li>
         ))}
       </ul>
     </div>

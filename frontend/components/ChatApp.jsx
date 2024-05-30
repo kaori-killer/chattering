@@ -16,12 +16,13 @@ const ChatApp = ({ room, usersByRoom, user }) => {
     useEffect(() => {
       socket.emit('join:room', room);
       socket.on('send:message', messageReceive);
+
+      localStorage.setItem('messages',  JSON.stringify(messages));
       
       return () => {
-        localStorage.setItem('messages',  JSON.stringify(messages));
         socket.off('send:message', messageReceive);
       };
-    }, [room]);
+    }, [messages]);
   
     const messageReceive = (message) => {
       setMessages((prevMessages) => [...prevMessages, message]);

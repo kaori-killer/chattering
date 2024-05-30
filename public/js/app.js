@@ -58,47 +58,40 @@ function App() {
   var user = _useState32[0];
   var setUser = _useState32[1];
 
-  var _useState4 = (0, _react.useState)('');
+  var _useState4 = (0, _react.useState)(JSON.parse(localStorage.getItem('rooms')) || []);
 
   var _useState42 = _slicedToArray(_useState4, 2);
 
-  var userPassword = _useState42[0];
-  var setUserPassword = _useState42[1];
+  var rooms = _useState42[0];
+  var setRooms = _useState42[1];
 
-  var _useState5 = (0, _react.useState)(JSON.parse(localStorage.getItem('rooms')) || []);
+  var _useState5 = (0, _react.useState)(JSON.parse(localStorage.getItem('usersByRoom')) || {});
 
   var _useState52 = _slicedToArray(_useState5, 2);
 
-  var rooms = _useState52[0];
-  var setRooms = _useState52[1];
+  var usersByRoom = _useState52[0];
+  var setUsersByRoom = _useState52[1];
 
-  var _useState6 = (0, _react.useState)(JSON.parse(localStorage.getItem('usersByRoom')) || {});
+  var _useState6 = (0, _react.useState)(rooms);
 
   var _useState62 = _slicedToArray(_useState6, 2);
 
-  var usersByRoom = _useState62[0];
-  var setUsersByRoom = _useState62[1];
+  var filteredRooms = _useState62[0];
+  var setFilteredRooms = _useState62[1];
 
-  var _useState7 = (0, _react.useState)(rooms);
+  var _useState7 = (0, _react.useState)(null);
 
   var _useState72 = _slicedToArray(_useState7, 2);
 
-  var filteredRooms = _useState72[0];
-  var setFilteredRooms = _useState72[1];
+  var selectedRoom = _useState72[0];
+  var setSelectedRoom = _useState72[1];
 
-  var _useState8 = (0, _react.useState)(null);
+  var _useState8 = (0, _react.useState)('');
 
   var _useState82 = _slicedToArray(_useState8, 2);
 
-  var selectedRoom = _useState82[0];
-  var setSelectedRoom = _useState82[1];
-
-  var _useState9 = (0, _react.useState)('');
-
-  var _useState92 = _slicedToArray(_useState9, 2);
-
-  var textField = _useState92[0];
-  var setTextField = _useState92[1];
+  var textField = _useState82[0];
+  var setTextField = _useState82[1];
 
   console.log(users, usersByRoom);
 
@@ -148,8 +141,8 @@ function App() {
     }
   };
 
-  var handleChangeName = function handleChangeName(newName, password) {
-    socket.emit('change:name', { name: newName, password: password }, function (result) {
+  var handleChangeName = function handleChangeName(newName) {
+    socket.emit('change:name', { name: newName }, function (result) {
       if (!newName) {
         return alert('아이디는 최소 1글자 이상으로 만들어주세요.');
       }
@@ -161,7 +154,6 @@ function App() {
         return [].concat(_toConsumableArray(prevUsers), [newName]);
       });
       setUser(newName);
-      setUserPassword(password);
     });
   };
 
@@ -305,11 +297,12 @@ var ChatApp = function ChatApp(_ref) {
     socket.emit('join:room', room);
     socket.on('send:message', messageReceive);
 
+    localStorage.setItem('messages', JSON.stringify(messages));
+
     return function () {
-      localStorage.setItem('messages', JSON.stringify(messages));
       socket.off('send:message', messageReceive);
     };
-  }, [room]);
+  }, [messages]);
 
   var messageReceive = function messageReceive(message) {
     setMessages(function (prevMessages) {

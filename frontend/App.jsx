@@ -14,7 +14,6 @@ export default function App() {
 
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState('');
-  const [userPassword, setUserPassword] = useState('');
 
   const [rooms, setRooms] = useState(JSON.parse(localStorage.getItem('rooms')) || []);
   const [usersByRoom, setUsersByRoom] = useState(JSON.parse(localStorage.getItem('usersByRoom')) || {});
@@ -66,8 +65,8 @@ export default function App() {
     }
   };
 
-  const handleChangeName = (newName, password) => {
-    socket.emit('change:name', { name: newName, password: password }, (result) => {
+  const handleChangeName = (newName) => {
+    socket.emit('change:name', { name: newName }, (result) => {
       if(!newName){
         return alert('아이디는 최소 1글자 이상으로 만들어주세요.');
       }
@@ -77,7 +76,6 @@ export default function App() {
 
       setUsers((prevUsers) => [...prevUsers, newName]);
       setUser(newName);
-      setUserPassword(password);
     });
   };
 

@@ -14,6 +14,7 @@ export default function App() {
 
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState('');
+  const [userPassword, setUserPassword] = useState('');
 
   const [rooms, setRooms] = useState(JSON.parse(localStorage.getItem('rooms')) || []);
   const [usersByRoom, setUsersByRoom] = useState(JSON.parse(localStorage.getItem('usersByRoom')) || {});
@@ -65,23 +66,25 @@ export default function App() {
     }
   };
 
-  const handleChangeName = (newName) => {
-    socket.emit('change:name', { name: newName }, (result) => {
+  const handleChangeName = (newName, password) => {
+    socket.emit('change:name', { name: newName, password: password }, (result) => {
+      if(!newName){
+        return alert('아이디는 최소 1글자 이상으로 만들어주세요.');
+      }
       if (!result) {
-        return alert('동일한 아이디가  이미 존재합니다. 다른 아이디로 만들어주세요.');
+        return alert('동일한 아이디가 이미 존재합니다. 다른 아이디로 만들어주세요.');
       }
 
       setUsers((prevUsers) => [...prevUsers, newName]);
       setUser(newName);
+      setUserPassword(password);
     });
   };
 
   return (
     <div>
       <div>
-        <h1>회원가입 - {user}</h1>
-        <ChangeNameForm onChangeName={handleChangeName} />
-        <h1>로그인 - {user}</h1>
+        <h1>로그인 - 어서오세요, {user}님</h1>
         <ChangeNameForm onChangeName={handleChangeName} />
       </div>
       <ChattingList 

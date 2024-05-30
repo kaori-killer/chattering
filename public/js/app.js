@@ -58,40 +58,47 @@ function App() {
   var user = _useState32[0];
   var setUser = _useState32[1];
 
-  var _useState4 = (0, _react.useState)(JSON.parse(localStorage.getItem('rooms')) || []);
+  var _useState4 = (0, _react.useState)('');
 
   var _useState42 = _slicedToArray(_useState4, 2);
 
-  var rooms = _useState42[0];
-  var setRooms = _useState42[1];
+  var userPassword = _useState42[0];
+  var setUserPassword = _useState42[1];
 
-  var _useState5 = (0, _react.useState)(JSON.parse(localStorage.getItem('usersByRoom')) || {});
+  var _useState5 = (0, _react.useState)(JSON.parse(localStorage.getItem('rooms')) || []);
 
   var _useState52 = _slicedToArray(_useState5, 2);
 
-  var usersByRoom = _useState52[0];
-  var setUsersByRoom = _useState52[1];
+  var rooms = _useState52[0];
+  var setRooms = _useState52[1];
 
-  var _useState6 = (0, _react.useState)(rooms);
+  var _useState6 = (0, _react.useState)(JSON.parse(localStorage.getItem('usersByRoom')) || {});
 
   var _useState62 = _slicedToArray(_useState6, 2);
 
-  var filteredRooms = _useState62[0];
-  var setFilteredRooms = _useState62[1];
+  var usersByRoom = _useState62[0];
+  var setUsersByRoom = _useState62[1];
 
-  var _useState7 = (0, _react.useState)(null);
+  var _useState7 = (0, _react.useState)(rooms);
 
   var _useState72 = _slicedToArray(_useState7, 2);
 
-  var selectedRoom = _useState72[0];
-  var setSelectedRoom = _useState72[1];
+  var filteredRooms = _useState72[0];
+  var setFilteredRooms = _useState72[1];
 
-  var _useState8 = (0, _react.useState)('');
+  var _useState8 = (0, _react.useState)(null);
 
   var _useState82 = _slicedToArray(_useState8, 2);
 
-  var textField = _useState82[0];
-  var setTextField = _useState82[1];
+  var selectedRoom = _useState82[0];
+  var setSelectedRoom = _useState82[1];
+
+  var _useState9 = (0, _react.useState)('');
+
+  var _useState92 = _slicedToArray(_useState9, 2);
+
+  var textField = _useState92[0];
+  var setTextField = _useState92[1];
 
   console.log(users, usersByRoom);
 
@@ -141,16 +148,20 @@ function App() {
     }
   };
 
-  var handleChangeName = function handleChangeName(newName) {
-    socket.emit('change:name', { name: newName }, function (result) {
+  var handleChangeName = function handleChangeName(newName, password) {
+    socket.emit('change:name', { name: newName, password: password }, function (result) {
+      if (!newName) {
+        return alert('아이디는 최소 1글자 이상으로 만들어주세요.');
+      }
       if (!result) {
-        return alert('동일한 아이디가  이미 존재합니다. 다른 아이디로 만들어주세요.');
+        return alert('동일한 아이디가 이미 존재합니다. 다른 아이디로 만들어주세요.');
       }
 
       setUsers(function (prevUsers) {
         return [].concat(_toConsumableArray(prevUsers), [newName]);
       });
       setUser(newName);
+      setUserPassword(password);
     });
   };
 
@@ -163,15 +174,9 @@ function App() {
       _react2['default'].createElement(
         'h1',
         null,
-        '회원가입 - ',
-        user
-      ),
-      _react2['default'].createElement(_componentsChangeNameFormJsx2['default'], { onChangeName: handleChangeName }),
-      _react2['default'].createElement(
-        'h1',
-        null,
-        '로그인 - ',
-        user
+        '로그인 - 어서오세요, ',
+        user,
+        '님'
       ),
       _react2['default'].createElement(_componentsChangeNameFormJsx2['default'], { onChangeName: handleChangeName })
     ),
@@ -228,11 +233,6 @@ var ChangeNameForm = function ChangeNameForm(_ref) {
   return _react2['default'].createElement(
     'div',
     { className: 'change_name_form' },
-    _react2['default'].createElement(
-      'h3',
-      null,
-      ' 회원가입 '
-    ),
     _react2['default'].createElement(
       'form',
       { onSubmit: handleSubmit },
@@ -337,17 +337,17 @@ exports['default'] = ChatApp;
 module.exports = exports['default'];
 
 },{"./MessageForm.jsx":6,"./MessageList.jsx":7,"./UsersList.jsx":8,"react":49,"socket.io-client":53}],4:[function(require,module,exports){
-"use strict";
+'use strict';
 
-Object.defineProperty(exports, "__esModule", {
+Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-exports["default"] = ChattingList;
+exports['default'] = ChattingList;
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
 function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i]; return arr2; } else { return Array.from(arr); } }
 
@@ -368,6 +368,10 @@ function ChattingList(_ref) {
   var usersByRoom = _ref.usersByRoom;
 
   var handleEnterRoom = function handleEnterRoom(room) {
+    if (!user) {
+      return alert('로그인이 필요합니다.');
+    }
+
     setSelectedRoom(room);
 
     setUsersByRoom(function (prevUsersByRoom) {
@@ -381,45 +385,45 @@ function ChattingList(_ref) {
     });
   };
 
-  return _react2["default"].createElement(
-    "div",
+  return _react2['default'].createElement(
+    'div',
     null,
-    _react2["default"].createElement(
-      "h1",
+    _react2['default'].createElement(
+      'h1',
       null,
-      "채팅방 목록"
+      '채팅방 목록'
     ),
-    _react2["default"].createElement("input", {
-      type: "text",
-      placeholder: "찾을 방",
+    _react2['default'].createElement('input', {
+      type: 'text',
+      placeholder: '찾을 방',
       value: textField,
       onChange: function (e) {
         return setTextField(e.target.value);
       }
     }),
-    _react2["default"].createElement(
-      "button",
-      { type: "button", onClick: handleSearchRooms },
-      "검색"
+    _react2['default'].createElement(
+      'button',
+      { type: 'button', onClick: handleSearchRooms },
+      '검색'
     ),
-    _react2["default"].createElement(
-      "ul",
+    _react2['default'].createElement(
+      'ul',
       null,
       filteredRooms.map(function (room, index) {
-        return _react2["default"].createElement(
-          "li",
+        return _react2['default'].createElement(
+          'li',
           { key: index },
-          _react2["default"].createElement(
-            "span",
+          _react2['default'].createElement(
+            'span',
             null,
             room
           ),
-          _react2["default"].createElement(
-            "button",
+          _react2['default'].createElement(
+            'button',
             { onClick: function () {
                 return handleEnterRoom(room);
               } },
-            "입장하기"
+            '입장하기'
           )
         );
       })
@@ -427,7 +431,7 @@ function ChattingList(_ref) {
   );
 }
 
-module.exports = exports["default"];
+module.exports = exports['default'];
 
 },{"react":49}],5:[function(require,module,exports){
 'use strict';

@@ -81,10 +81,12 @@ module.exports = function (socket) {
       userNames.free(oldName);
 
       name = data.name;
+      password = data.password;
       
       socket.broadcast.emit('change:name', {
         oldName: oldName,
-        newName: name
+        newName: name,
+        password: password,
       });
 
       fn(true);

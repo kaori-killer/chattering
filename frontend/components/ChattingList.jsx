@@ -2,6 +2,10 @@ import React from 'react';
 
 export default function ChattingList({ textField, setTextField, filteredRooms, handleSearchRooms, setSelectedRoom, setUsersByRoom, user, usersByRoom }) {
   const handleEnterRoom = (room) => {
+    if(!user){
+      return alert('로그인이 필요합니다.');
+    }
+
     setSelectedRoom(room);
 
     setUsersByRoom((prevUsersByRoom) => {

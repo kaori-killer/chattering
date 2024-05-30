@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 
 import ChattingList from './components/ChattingList.jsx';
-import ChangeNameForm from './components/ChangeNameForm.jsx';
 import ChatApp from './components/ChatApp.jsx';
+import LoginForm from './components/LoginForm.jsx';
 
 export default function App() {
   const socketRef = useRef();
@@ -81,10 +81,7 @@ export default function App() {
 
   return (
     <div>
-      <div>
-        <h1>로그인 - 어서오세요, {user}님</h1>
-        <ChangeNameForm onChangeName={handleChangeName} />
-      </div>
+      <LoginForm user={user} handleChangeName={handleChangeName} />
       <ChattingList 
         textField={textField} 
         setTextField={setTextField}

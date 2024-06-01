@@ -619,9 +619,9 @@ var MessageList = function MessageList(_ref) {
     _react2['default'].createElement(
       'h2',
       null,
-      ' 방재: ',
+      ' ⭐️ ',
       room,
-      ' '
+      ' ⭐️'
     ),
     _react2['default'].createElement(
       'div',

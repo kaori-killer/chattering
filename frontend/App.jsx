@@ -7,6 +7,11 @@ import ChattingList from './components/ChattingList.jsx';
 import ChatApp from './components/ChatApp.jsx';
 import LoginForm from './components/LoginForm.jsx';
 
+const Container = styled.div`
+  display: flex;
+  justify-content: center;
+`;
+
 export default function App() {
   const socketRef = useRef();
   if (!socketRef.current) {
@@ -25,6 +30,9 @@ export default function App() {
   const [textField, setTextField] = useState('');
 
   const ErrorMessage = styled.p`
+    width: 500px;
+    height: 400px;
+
     color: red;
  `;
 
@@ -87,6 +95,7 @@ export default function App() {
     <div>
       <h1>인천대 채팅 애플리케이션 💬</h1>
       <LoginForm user={user} handleChangeName={handleChangeName} />
+      <Container>
       {user ? 
       <ChattingList 
         textField={textField} 
@@ -106,10 +115,10 @@ export default function App() {
         ) : 
         (
           <div>
-            <hr/>
             <ErrorMessage>현재 입장된 채팅방이 없습니다.</ErrorMessage>
           </div>
         )}
+      </Container>
     </div>
   );
 }

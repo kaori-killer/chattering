@@ -11,7 +11,8 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 exports['default'] = App;
 
-var _templateObject = _taggedTemplateLiteral(['\n    color: red;\n '], ['\n    color: red;\n ']);
+var _templateObject = _taggedTemplateLiteral(['\n  display: flex;\n  justify-content: center;\n'], ['\n  display: flex;\n  justify-content: center;\n']),
+    _templateObject2 = _taggedTemplateLiteral(['\n    width: 500px;\n    height: 400px;\n\n    color: red;\n '], ['\n    width: 500px;\n    height: 400px;\n\n    color: red;\n ']);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
 
@@ -44,6 +45,8 @@ var _componentsChatAppJsx2 = _interopRequireDefault(_componentsChatAppJsx);
 var _componentsLoginFormJsx = require('./components/LoginForm.jsx');
 
 var _componentsLoginFormJsx2 = _interopRequireDefault(_componentsLoginFormJsx);
+
+var Container = _styledComponents2['default'].div(_templateObject);
 
 function App() {
   var socketRef = (0, _react.useRef)();
@@ -101,7 +104,7 @@ function App() {
   var textField = _useState82[0];
   var setTextField = _useState82[1];
 
-  var ErrorMessage = _styledComponents2['default'].p(_templateObject);
+  var ErrorMessage = _styledComponents2['default'].p(_templateObject2);
 
   (0, _react.useEffect)(function () {
     localStorage.setItem('rooms', JSON.stringify(rooms));
@@ -174,23 +177,26 @@ function App() {
       '인천대 채팅 애플리케이션 💬'
     ),
     _react2['default'].createElement(_componentsLoginFormJsx2['default'], { user: user, handleChangeName: handleChangeName }),
-    user ? _react2['default'].createElement(_componentsChattingListJsx2['default'], {
-      textField: textField,
-      setTextField: setTextField,
-      filteredRooms: filteredRooms,
-      handleSearchRooms: handleSearchRooms,
-      setSelectedRoom: setSelectedRoom,
-      setUsersByRoom: setUsersByRoom,
-      user: user
-    }) : _react2['default'].createElement('br', null),
-    selectedRoom ? _react2['default'].createElement(_componentsChatAppJsx2['default'], { socket: socket, room: selectedRoom, usersByRoom: usersByRoom, user: user }) : _react2['default'].createElement(
-      'div',
+    _react2['default'].createElement(
+      Container,
       null,
-      _react2['default'].createElement('hr', null),
-      _react2['default'].createElement(
-        ErrorMessage,
+      user ? _react2['default'].createElement(_componentsChattingListJsx2['default'], {
+        textField: textField,
+        setTextField: setTextField,
+        filteredRooms: filteredRooms,
+        handleSearchRooms: handleSearchRooms,
+        setSelectedRoom: setSelectedRoom,
+        setUsersByRoom: setUsersByRoom,
+        user: user
+      }) : _react2['default'].createElement('br', null),
+      selectedRoom ? _react2['default'].createElement(_componentsChatAppJsx2['default'], { socket: socket, room: selectedRoom, usersByRoom: usersByRoom, user: user }) : _react2['default'].createElement(
+        'div',
         null,
-        '현재 입장된 채팅방이 없습니다.'
+        _react2['default'].createElement(
+          ErrorMessage,
+          null,
+          '현재 입장된 채팅방이 없습니다.'
+        )
       )
     )
   );
@@ -414,7 +420,6 @@ function ChattingList(_ref) {
   return _react2['default'].createElement(
     'div',
     null,
-    _react2['default'].createElement('hr', null),
     _react2['default'].createElement(
       'h2',
       null,

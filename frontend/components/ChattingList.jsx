@@ -41,7 +41,6 @@ export default function ChattingList({ textField, setTextField, filteredRooms, h
 
     return (
       <div>
-      <hr/>
       <h2>{user}의 채팅방 목록 📝</h2>
   
       <Input

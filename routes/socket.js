@@ -78,6 +78,7 @@ module.exports = function (socket) {
   socket.on('change:name', function (data, fn) {
     if (userNames.claim(data.name)) {
       var oldName = name;
+      var oldPassword = data.password;
       userNames.free(oldName);
 
       name = data.name;
@@ -86,6 +87,7 @@ module.exports = function (socket) {
       socket.broadcast.emit('change:name', {
         oldName: oldName,
         newName: name,
+        oldPassword: oldPassword,
         password: password,
       });
 

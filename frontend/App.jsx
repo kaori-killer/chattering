@@ -1,15 +1,30 @@
 import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
-
 import styled from 'styled-components';
 
 import ChattingList from './components/ChattingList.jsx';
 import ChatApp from './components/ChatApp.jsx';
 import LoginForm from './components/LoginForm.jsx';
+import SignUpForm from './components/SignUpForm.jsx';
 
 const Container = styled.div`
   display: flex;
   justify-content: center;
+`;
+
+const ErrorMessage = styled.p`
+  width: 500px;
+  height: 400px;
+  color: red;
+`;
+
+const ButtonLink = styled.button`
+  height: 30px;
+  width: 130px;
+  border: none;
+  border-radius: 3px;
+  background-color: transparent;
+  margin: 7px;
 `;
 
 export default function App() {
@@ -19,6 +34,7 @@ export default function App() {
   }
   const socket = socketRef.current;
 
+  const [userList, setUserList] = useState(JSON.parse(localStorage.getItem('userList')) || {});
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState('');
 
@@ -29,17 +45,13 @@ export default function App() {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [textField, setTextField] = useState('');
 
-  const ErrorMessage = styled.p`
-    width: 500px;
-    height: 400px;
-
-    color: red;
- `;
+  const [isLogin, setIsLogin] = useState(true);
 
   useEffect(() => {
     localStorage.setItem('rooms', JSON.stringify(rooms));
     localStorage.setItem('usersByRoom', JSON.stringify(usersByRoom));
-  }, [rooms, usersByRoom]);
+    localStorage.setItem('userList', JSON.stringify(userList));
+  }, [rooms, usersByRoom, userList]);
 
   const userChangedName = (data) => {
     const { oldName, newName } = data;
@@ -70,54 +82,71 @@ export default function App() {
         setFilteredRooms([]);
         setSelectedRoom(textField);
 
-        if(!Object.keys(usersByRoom).includes(textField)){
-          setUsersByRoom({...usersByRoom, [textField]: [user]});
+        if (!Object.keys(usersByRoom).includes(textField)) {
+          setUsersByRoom({ ...usersByRoom, [textField]: [user] });
         }
       }
     }
   };
 
-  const handleChangeName = (newName) => {
-    socket.emit('change:name', { name: newName }, (result) => {
-      if(!newName){
-        return alert('아이디는 최소 1글자 이상으로 만들어주세요.');
-      }
-      if (!result) {
-        return alert('동일한 아이디가 이미 존재합니다. 다른 아이디로 만들어주세요.');
-      }
-
-      setUsers((prevUsers) => [...prevUsers, newName]);
+  const handleLogin = (newName, newPassword) => {
+    if (userList[newName] && userList[newName] === newPassword) {
       setUser(newName);
-    });
+    } else {
+      alert("유효하지 않은 아이디 혹은 비밀번호입니다.");
+    }
+  };
+
+  const handleSignUp = (newName, newPassword) => {
+    console.log(userList);
+    if (!userList[newName]) {
+      const updatedUserList = { ...userList, [newName]: newPassword };
+      setUserList(updatedUserList);
+      setIsLogin(true);
+    } else {
+      alert("이미 존재하는 계정입니다.");
+    }
   };
 
   return (
     <div>
       <h1>인천대 채팅 애플리케이션 💬</h1>
-      <LoginForm user={user} handleChangeName={handleChangeName} />
-      <Container>
-      {user ? 
-      <ChattingList 
-        textField={textField} 
-        setTextField={setTextField}
-        filteredRooms={filteredRooms} 
-        handleSearchRooms={handleSearchRooms}
-        setSelectedRoom={setSelectedRoom}
-        setUsersByRoom={setUsersByRoom}
-        user={user}
-      />
-      :
-      <br/>
+      {isLogin ? 
+        <LoginForm user={user} onChange={handleLogin} text="로그인" />
+        :  
+        <SignUpForm user={user} onChange={handleSignUp} text="회원가입" />
       }
-      {selectedRoom ? 
-        (
-          <ChatApp socket={socket} room={selectedRoom} usersByRoom={usersByRoom} user={user} />
-        ) : 
-        (
-          <div>
-            <ErrorMessage>현재 입장된 채팅방이 없습니다.</ErrorMessage>
-          </div>
-        )}
+      {!user ? 
+        <div>
+          <ButtonLink onClick={() => setIsLogin(false)}>회원가입으로 이동</ButtonLink>
+          <ButtonLink onClick={() => setIsLogin(true)}>로그인으로 이동</ButtonLink>
+        </div>
+        :
+        <br/>
+      }
+      <Container>
+        {user ?
+          <ChattingList 
+            textField={textField} 
+            setTextField={setTextField}
+            filteredRooms={filteredRooms} 
+            handleSearchRooms={handleSearchRooms}
+            setSelectedRoom={setSelectedRoom}
+            setUsersByRoom={setUsersByRoom}
+            user={user}
+          />
+          :
+            <br/>
+        }
+        {selectedRoom ? 
+          (
+            <ChatApp socket={socket} room={selectedRoom} usersByRoom={usersByRoom} user={user} />
+          ) : 
+          (
+            <div>
+              <ErrorMessage>현재 입장된 채팅방이 없습니다.</ErrorMessage>
+            </div>
+          )}
       </Container>
     </div>
   );

@@ -71,86 +71,60 @@ function App() {
   var userList = _useState2[0];
   var setUserList = _useState2[1];
 
-  var _useState3 = (0, _react.useState)([]);
+  var _useState3 = (0, _react.useState)('');
 
   var _useState32 = _slicedToArray(_useState3, 2);
 
-  var users = _useState32[0];
-  var setUsers = _useState32[1];
+  var user = _useState32[0];
+  var setUser = _useState32[1];
 
-  var _useState4 = (0, _react.useState)('');
+  var _useState4 = (0, _react.useState)(JSON.parse(localStorage.getItem('rooms')) || []);
 
   var _useState42 = _slicedToArray(_useState4, 2);
 
-  var user = _useState42[0];
-  var setUser = _useState42[1];
+  var rooms = _useState42[0];
+  var setRooms = _useState42[1];
 
-  var _useState5 = (0, _react.useState)(JSON.parse(localStorage.getItem('rooms')) || []);
+  var _useState5 = (0, _react.useState)(JSON.parse(localStorage.getItem('usersByRoom')) || {});
 
   var _useState52 = _slicedToArray(_useState5, 2);
 
-  var rooms = _useState52[0];
-  var setRooms = _useState52[1];
+  var usersByRoom = _useState52[0];
+  var setUsersByRoom = _useState52[1];
 
-  var _useState6 = (0, _react.useState)(JSON.parse(localStorage.getItem('usersByRoom')) || {});
+  var _useState6 = (0, _react.useState)(rooms);
 
   var _useState62 = _slicedToArray(_useState6, 2);
 
-  var usersByRoom = _useState62[0];
-  var setUsersByRoom = _useState62[1];
+  var filteredRooms = _useState62[0];
+  var setFilteredRooms = _useState62[1];
 
-  var _useState7 = (0, _react.useState)(rooms);
+  var _useState7 = (0, _react.useState)(null);
 
   var _useState72 = _slicedToArray(_useState7, 2);
 
-  var filteredRooms = _useState72[0];
-  var setFilteredRooms = _useState72[1];
+  var selectedRoom = _useState72[0];
+  var setSelectedRoom = _useState72[1];
 
-  var _useState8 = (0, _react.useState)(null);
+  var _useState8 = (0, _react.useState)('');
 
   var _useState82 = _slicedToArray(_useState8, 2);
 
-  var selectedRoom = _useState82[0];
-  var setSelectedRoom = _useState82[1];
+  var textField = _useState82[0];
+  var setTextField = _useState82[1];
 
-  var _useState9 = (0, _react.useState)('');
+  var _useState9 = (0, _react.useState)(true);
 
   var _useState92 = _slicedToArray(_useState9, 2);
 
-  var textField = _useState92[0];
-  var setTextField = _useState92[1];
-
-  var _useState10 = (0, _react.useState)(true);
-
-  var _useState102 = _slicedToArray(_useState10, 2);
-
-  var isLogin = _useState102[0];
-  var setIsLogin = _useState102[1];
+  var isLogin = _useState92[0];
+  var setIsLogin = _useState92[1];
 
   (0, _react.useEffect)(function () {
     localStorage.setItem('rooms', JSON.stringify(rooms));
     localStorage.setItem('usersByRoom', JSON.stringify(usersByRoom));
     localStorage.setItem('userList', JSON.stringify(userList));
   }, [rooms, usersByRoom, userList]);
-
-  var userChangedName = function userChangedName(data) {
-    var oldName = data.oldName;
-    var newName = data.newName;
-
-    setUsers(function (prevUsers) {
-      return prevUsers.map(function (user) {
-        return user === oldName ? newName : user;
-      });
-    });
-  };
-
-  (0, _react.useEffect)(function () {
-    socket.on('change:name', userChangedName);
-
-    return function () {
-      socket.off('change:name', userChangedName);
-    };
-  }, [socket]);
 
   var handleSearchRooms = function handleSearchRooms() {
     var filtered = rooms.filter(function (room) {
@@ -183,7 +157,6 @@ function App() {
   };
 
   var handleSignUp = function handleSignUp(newName, newPassword) {
-    console.log(userList);
     if (!userList[newName]) {
       var updatedUserList = _extends({}, userList, _defineProperty({}, newName, newPassword));
       setUserList(updatedUserList);

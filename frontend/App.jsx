@@ -35,7 +35,6 @@ export default function App() {
   const socket = socketRef.current;
 
   const [userList, setUserList] = useState(JSON.parse(localStorage.getItem('userList')) || {});
-  const [users, setUsers] = useState([]);
   const [user, setUser] = useState('');
 
   const [rooms, setRooms] = useState(JSON.parse(localStorage.getItem('rooms')) || []);
@@ -52,22 +51,6 @@ export default function App() {
     localStorage.setItem('usersByRoom', JSON.stringify(usersByRoom));
     localStorage.setItem('userList', JSON.stringify(userList));
   }, [rooms, usersByRoom, userList]);
-
-  const userChangedName = (data) => {
-    const { oldName, newName } = data;
-
-    setUsers((prevUsers) =>
-      prevUsers.map((user) => (user === oldName ? newName : user))
-    );
-  };
-
-  useEffect(() => {
-    socket.on('change:name', userChangedName);
-
-    return () => {
-      socket.off('change:name', userChangedName);
-    };
-  }, [socket]);
 
   const handleSearchRooms = () => {
     const filtered = rooms.filter((room) => room.includes(textField));
@@ -98,7 +81,6 @@ export default function App() {
   };
 
   const handleSignUp = (newName, newPassword) => {
-    console.log(userList);
     if (!userList[newName]) {
       const updatedUserList = { ...userList, [newName]: newPassword };
       setUserList(updatedUserList);
